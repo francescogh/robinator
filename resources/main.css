@@ -1,0 +1,83 @@
+h2, h3, legend, label {    
+    color: #FFF;
+}
+
+#header {
+    background-color: #FF953D;
+}
+
+#header h1 {
+    font: italic bold 1em Helvetica, sans-serif;
+    color: #B65300;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    margin: 0;
+}
+
+#main {    
+    background-color: #FF7400; 
+    border-bottom: 0.25em solid #FF7400;
+    min-height: 96vh;    
+}
+
+#fixtures .rInterval {   
+    background-color: #FF953D; 
+    text-align: center;
+} 
+
+#fixtures .cNumber {
+    text-align: center;
+} 
+
+#leaderboard{
+    background-color: #FF953D;
+    font-size: 1.2em;
+}
+
+#leaderboard .lb-even { background-color: #FFE5D0; }
+#leaderboard .lb-odd { background-color: #F8F9FA; }
+
+.fxTableWrap {    
+    margin: 0 0 1em; 
+    font-size: 12px;
+}
+
+.fxTable {
+    border: 1px solid #B65300;
+}
+
+.fxTable .btn {
+    width: 100%;
+    min-width: 100%;
+    min-height: 100%;
+    overflow-wrap: anywhere;
+}
+
+.fxTable .btn.btn-success {
+    color: #000;
+    background-color: #4F4;
+}
+
+.fxTable .btn.btn-danger {
+    color: #000;
+    background-color: #FA9;
+}
+
+.fxTable .btn.btn-warning {
+    color: #000;
+    background-color: #FF8;
+}
+
+.fxTable .btn.btn-light:disabled {
+    background-color: transparent;
+}
+
+@media screen and (min-width: 768px) {
+
+    #fixtures {
+        max-height: calc(100vh - 110px);
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+}
