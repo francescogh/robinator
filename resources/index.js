@@ -1,4 +1,4 @@
-/********************* app constants *****************************************/
+/********************* constants *************************************************/
 
 const DEFAULT_TEAM_NAME_PREFIX = 'Jets';
 
@@ -72,45 +72,15 @@ const PARAMS_DEFAULTS = {
     LOSS_PTS : 0
 };
 
-/********************* /app constants ****************************************/
-
-/********************* app status variables **********************************/
-
-const teams = [];
-const fixtures = [];
-const params = {
-    setup : PARAMS_DEFAULTS.SETUP,
-    takedown : PARAMS_DEFAULTS.TAKEDOWN,
-    breaks : PARAMS_DEFAULTS.BREAKS,
-    end : PARAMS_DEFAULTS.END,
-    wp : PARAMS_DEFAULTS.WIN_PTS,
-    dp : PARAMS_DEFAULTS.DRAW_PTS,
-    lp : PARAMS_DEFAULTS.LOSS_PTS
-};
-
-/******************** /app status variables **********************************/
-
-function updateParams(){
-    params.setup = parseInt(document.querySelector('#setup').value);
-    params.takedown = parseInt(document.querySelector('#takedown').value);
-    params.breaks = parseInt(document.querySelector('#breaks').value);
-    params.end = document.querySelector('#end').value;
-    params.wp = parseInt(document.querySelector('#wp').value);
-    params.dp = parseInt(document.querySelector('#dp').value);
-    params.lp = parseInt(document.querySelector('#lp').value);
-}
+/********************* general utils **********************************************************/
 
 let rSeed = 1;
 
 /**
- * random number generator
- * 
- * @param {integer} topVal 
- * 
+ * @param {integer} topVal  
  * @returns a number between 0 (included) and topVal (excluded)
  */
 function getRandomNum(topVal){
-
     const d = new Date().getMilliseconds();
     const r = Math.floor(Math.random() * 1000 * rSeed++);  
     return (d + r) % topVal;
@@ -120,228 +90,309 @@ function getRandomName(){
 
     let name = '';
 
-    let type = getRandomNum(NAME_TYPES.length);
+    const sets = NAME_TYPES[getRandomNum(NAME_TYPES.length)].split(' + ');
 
-    const typeSplits = NAME_TYPES[type].split(' + ');
-
-    for(let ts = 0; ts < typeSplits.length; ts++) {
-
-        const set = SET_OF[`${typeSplits[ts]}`]
-        
-        let s = getRandomNum(set.length);
-
-        name += set[s] + ' ';
+    for(let s = 0; s < sets.length; s++) {
+        const set = SET_OF[`${sets[s]}`]; 
+        name += set[getRandomNum(set.length)] + ' ';
     }
 
     return name.trim();
 }
 
-function fetchTeams(){
+function even(n) {
+    return n + n % 2;
+}
+
+function rounds_for(nt) {
+    return even(nt) - 1;
+}
+
+function courts_for(nt) {
+    return even(nt) / 2;
+}
+
+/**
+ * get an array of 0-based indexes where if nTeams is odd eventually an extra index is added in the second position 
+ * because we want to leave the pivot team in court 1 side 1, and match the fake team with the pivot team in the last round
+ */
+function getEvenArrayOfIndexes(nTeams){
+
+    const res = [...Array(nTeams).keys()];
+
+    if(nTeams % 2 != 0) {
+        // add the next index (nTeams) in second position (1)
+        res.splice(1, 0, nTeams);
+    }
+
+    return res;
+}
+
+function rr(indexes, round){
+
+    if(round > 1) {        
+        const tmp = indexes.pop();
+        indexes.splice(1, 0, tmp);
+        rr(indexes, round - 1);
+    }
+}
+
+/**
+ * get the 0-based index of the team at (round, court, side)
+ */
+function getTeamIndexFor(nTeams, round, court, side) {
     
-    // reset the array first
-    teams.splice(0, teams.length);
-    
-    // fetch team names from input controls
-    for(let i = 1; i <= 10; i++) {
-        input = document.querySelector(`\#team${i}_INPUT`);
-        if(input.value.trim() != '') {
-            const name = input.value.trim();
-            const score = 0;
-            teams.push({name, score});
+    const indexes = getEvenArrayOfIndexes(nTeams); 
+
+    rr(indexes, round);
+
+    if(side == 1) return indexes[court - 1];
+    else return indexes[indexes.length - court];
+}
+
+/********************* local storage utils *********************************************************/
+
+function localStorage_getItem_or_int(key, alt) {
+    const item = parseInt(localStorage.getItem(key));
+    return (item) ? item : alt;    
+}
+
+function localStorage_getItem_or_string(key, alt) {
+    const item = localStorage.getItem(key);
+    return (item !== null) ? item : alt;    
+}
+
+function localStorage_getObject(key) {
+    return JSON.parse(localStorage.getItem(key));
+}
+
+function localStorage_setString(key, value) {
+    return localStorage.setItem(key, value.toString());
+}
+
+function localStorage_setObject(key, value) {
+    return localStorage.setItem(key, JSON.stringify(value));
+}
+
+/********************* app object ****************************************************/
+
+const app = {
+    params : {
+        setup : null,
+        takedown : null,
+        breaks : null,
+        end : null,
+        win_pts : null,
+        draw_pts : null,
+        loss_pts :null
+    },   
+    nTeams : 0, 
+    teams : [],     // one team example: {name: "Jets 1", score: 10}
+    fixtures : [],  // one fixture example: {r:3, c:1, team1Id: 0, team2Id: 3, result: 'x'} // possible results are '1', 'x', '2', '-'. // teamNId : null in case of the placeholder team
+
+    syncWithStorage : function() {
+        this.params.setup = localStorage_getItem_or_int('setup', PARAMS_DEFAULTS.SETUP);
+        this.params.takedown = localStorage_getItem_or_int('takedown', PARAMS_DEFAULTS.TAKEDOWN);
+        this.params.breaks = localStorage_getItem_or_int('breaks', PARAMS_DEFAULTS.BREAKS);
+        this.params.end = localStorage_getItem_or_string('end', PARAMS_DEFAULTS.END);
+        this.params.win_pts = localStorage_getItem_or_int('win_pts', PARAMS_DEFAULTS.WIN_PTS);
+        this.params.draw_pts = localStorage_getItem_or_int('draw_pts', PARAMS_DEFAULTS.DRAW_PTS);
+        this.params.loss_pts = localStorage_getItem_or_int('loss_pts', PARAMS_DEFAULTS.LOSS_PTS);
+
+        // if no params in the storage, then initialize them from this object
+        if(!localStorage.getItem('setup'))
+            this.setStorageParamsFromThis();
+
+        this.nTeams = localStorage_getItem_or_int('nTeams', 0);
+
+        // if no nTeams in the storage, then initialize it from this object
+        if(!localStorage.getItem('nTeams'))
+            this.setStorageNTeamsFromThis();
+
+        if(this.nTeams > 0) {
+
+            for(let i = 0; i < this.nTeams; i++) {
+                this.teams.push(localStorage_getObject(`team_${i}`));
+            }
+
+            // if we have teams, we also have fixtures...  
+            for(let i = 1; i <= rounds_for(this.nTeams); i++) {
+                for(let j = 1; j <= courts_for(this.nTeams); j++) {
+                    this.fixtures.push(localStorage_getObject(`fixture_${i}_${j}`));
+                }
+            }
+        }
+    },
+
+    update : function(paramValues, teamNames) {
+
+        // clear the storage.....................
+        localStorage.clear();
+
+        // update params.........................
+        this.params.setup = paramValues.setup;
+        this.params.takedown = paramValues.takedown;
+        this.params.breaks = paramValues.breaks;
+        this.params.end = paramValues.end;
+        this.params.win_pts = paramValues.win_pts;
+        this.params.draw_pts = paramValues.draw_pts;
+        this.params.loss_pts = paramValues.loss_pts;
+        this.setStorageParamsFromThis();
+
+        // update nTeams.........................
+        this.nTeams = teamNames.length;
+        this.setStorageNTeamsFromThis();
+
+        // update teams..........................
+
+        // reset the array first
+        this.teams.splice(0, this.teams.length);
+
+        for(let i = 0; i < teamNames.length; i++){
+            this.teams.push({name: teamNames[i], score: 0});
+        }   
+
+        this.setStorageTeamsFromThis();
+
+        // update fixtures......................
+
+        // reset the array first
+        this.fixtures.splice(0, this.fixtures.length);
+
+        for(let i = 1; i <= rounds_for(this.nTeams); i++) {
+            for(let j = 1; j <= courts_for(this.nTeams); j++) {
+                const team1Id = getTeamIndexFor(this.nTeams, i, j, 1);
+                const team2Id = getTeamIndexFor(this.nTeams, i, j, 2);
+                const t1Id = (team1Id == this.nTeams) ? null : team1Id;                
+                const t2Id = (team2Id == this.nTeams) ? null : team2Id;
+                this.fixtures.push({r: i, c: j, team1Id: t1Id, team2Id: t2Id, result: '-'});
+            }
+        }
+
+        this.setStorageFixturesFromThis();
+    },
+
+    setResult : function(r, c, newRes) {
+
+        const fixture = this.getFixtureByRC(r, c);        
+        const oldRes = fixture.result;
+
+        this.teams[fixture.team1Id].score += this.getScoreDiff(1, newRes, oldRes);        
+        this.teams[fixture.team2Id].score += this.getScoreDiff(2, newRes, oldRes);
+
+        fixture.result = newRes;
+
+        localStorage_setObject(`fixture_${r}_${c}`, fixture);        
+        localStorage_setObject(`team_${fixture.team1Id}`,  this.teams[fixture.team1Id]);     
+        localStorage_setObject(`team_${fixture.team2Id}`,  this.teams[fixture.team2Id]);
+    },
+
+    getScoreDiff : function(side, newRes, oldRes){
+        const multiplier = [0, this.params.loss_pts, this.params.draw_pts, this.params.win_pts];
+        let newM = 0; oldM = 0;
+        if(newRes === 'x') newM = 2; else if (newRes !== '-' && parseInt(newRes) === side) newM = 3; else if (newRes !== '-' && parseInt(newRes) !== side) newM = 1;
+        if(oldRes === 'x') oldM = 2; else if (oldRes !== '-' && parseInt(oldRes) === side) oldM = 3; else if (oldRes !== '-' && parseInt(oldRes) !== side) oldM = 1;
+        return multiplier[newM] - multiplier[oldM];
+    },
+
+    getFixtureByRC : function(r, c){
+        return this.fixtures.find(function(f){
+            return (f.r === r && f.c === c);
+        });
+    },
+
+    getFixtureResult : function(r, c) {
+        const fixture = this.getFixtureByRC(r, c);
+        return fixture.result;
+    },
+
+    getTeamNameByCardinal : function(card) {
+        return (card <= this.teams.length) ? this.teams[card-1].name : '';
+    },
+
+    getTeamNameFromFixture : function(r, c, s) {
+        const fixture =  this.getFixtureByRC(r, c);
+        const teamId = (s === 1) ? fixture.team1Id : fixture.team2Id;
+        return (teamId === null) ? teamId : this.teams[teamId].name;
+    },    
+
+    getRoundInterval : function(r){
+
+        const endSplits = app.params.end.split(':');
+        const endDate = new Date();
+        endDate.setHours(parseInt(endSplits[0]));    
+        endDate.setMinutes(parseInt(endSplits[1])); 
+
+        const nowDate = new Date();
+        
+        const mmLeft = (endDate.getTime() - nowDate.getTime()) / (60 * 1000) - app.params.setup - app.params.takedown - app.params.breaks * (rounds_for(this.nTeams) - 1);
+
+        const duration = Math.round(mmLeft / rounds_for(this.nTeams));
+
+        const fromStart = app.params.setup + (r - 1) * (duration + app.params.breaks);
+
+        const startDate = new Date(nowDate.getTime() + fromStart * 60 * 1000);
+
+        const stopDate = new Date(startDate.getTime() + duration * 60 * 1000);
+
+        const sh = String(startDate.getHours()).padStart(2, '0');
+        const sm = String(startDate.getMinutes()).padStart(2, '0');
+        const eh = String(stopDate.getHours()).padStart(2, '0');
+        const em = String(stopDate.getMinutes()).padStart(2, '0');
+
+        return `${sh}:${sm} - ${eh}:${em}`;
+    },
+
+    setStorageParamsFromThis : function() {
+        localStorage_setString('setup', this.params.setup);
+        localStorage_setString('takedown', this.params.takedown);
+        localStorage_setString('breaks', this.params.breaks);
+        localStorage.setItem('end', this.params.end);
+        localStorage_setString('win_pts', this.params.win_pts);
+        localStorage_setString('draw_pts', this.params.draw_pts);
+        localStorage_setString('loss_pts', this.params.loss_pts);
+    },
+
+    setStorageNTeamsFromThis : function() {
+        localStorage_setString('nTeams', this.nTeams);
+    },
+
+    setStorageTeamsFromThis : function() {
+        for(let i = 0; i < this.teams.length; i++) {
+            localStorage_setObject(`team_${i}`, this.teams[i]);
+        }
+    },
+
+    setStorageFixturesFromThis : function() {
+        for(let i = 1; i <= rounds_for(this.nTeams); i++) {
+            for(let j = 1; j <= courts_for(this.nTeams); j++) {
+                localStorage_setObject(`fixture_${i}_${j}`, this.getFixtureByRC(i, j));
+            }
         }
     }
 }
 
-function generateFixtures(){
+/********************* UI utils ****************************************************/
 
-    const fixtures = document.getElementById('fixtures');
-
-    const nRounds = teams.length + teams.length % 2 - 1;
-    const nCourts = (teams.length + teams.length % 2) / 2;
-
-    const resultButtons = {};
-
-    for (let r = 1; r <= nRounds; r++) {
-
-        const tableWrap = document.createElement('div'); 
-        tableWrap.classList.add('fxTableWrap');                       
-
-        const wall1 = document.createElement('div');
-        wall1.classList.add('rInterval');
-        wall1.innerHTML = getInterval(r, nRounds);
-
-        const table = document.createElement('div'); 
-        table.classList.add('fxTable');
-
-        const side1 = document.createElement('div');
-        side1.classList.add('row', 'gx-1', 'gx-md-2');        
-
-        const net = document.createElement('div');
-        net.classList.add('row');
-        net.innerHTML = `<div class="col"><hr class="my-0"></div>`;
-
-        const side2 = document.createElement('div');
-        side2.classList.add('row', 'gx-1', 'gx-md-2');   
-        
-        for(let c = 1; c <= nCourts; c++) {
-            side1.appendChild(createCell(r, c, 1)); 
-            side2.appendChild(createCell(r, c, 2)); 
-        }
-
-        table.appendChild(side1);
-        table.appendChild(net);
-        table.appendChild(side2);                 
-
-        const wall2 = document.createElement('div');
-        wall2.classList.add('row', 'gx-1', 'gx-md-2');
-        for(let c = 1; c <= nCourts; c++) { 
-            const cNumber = document.createElement('div');
-            cNumber.classList.add('col', 'cNumber');
-            cNumber.innerHTML = c;
-            wall2.appendChild(cNumber);
-        }
-        
-        tableWrap.appendChild(wall1);   
-        tableWrap.appendChild(table);
-        tableWrap.appendChild(wall2);   
-
-        fixtures.appendChild(tableWrap);
-    }
+function updateControls() {
+    updateParamsControls();
+    updateTeamsControls();
 }
 
-function createCell(r, c, s){
-
-    const cell = document.createElement('div');
-    cell.classList.add('col', 'p-1');
-
-    resultButton = document.createElement('button');    
-    resultButton.setAttribute('id', `result_${r}_${c}_${s}_BTN`);            
-    resultButton.classList.add('btn', 'btn-light', 'btn-sm', 'p-1');
-    resultButton.setAttribute('type', 'button');   
-
-    const idA = getTeamIndexFor(r, c, s);
-    const idB = getTeamIndexFor(r, c, 3-s)
-
-    const teamNameA = getTeamName(idA); 
-    const teamNameB = getTeamName(idB); 
-
-    resultButton.innerHTML  = teamNameA != null ? teamNameA : '---';
-
-    if(teamNameA == null || teamNameB == null) resultButton.setAttribute('disabled', 'true');
-
-    resultButton.addEventListener('click', function (event) {
-
-        disableBack();
-
-        const btA = event.target;
-        const btB = document.querySelector(`#result_${r}_${c}_${(3-s)}_BTN`);  
-
-        if(btA.classList.contains('btn-light')) {
-            
-            btA.classList.replace('btn-light', 'btn-success');
-            teams[idA].score += params.wp;
-
-            btB.classList.replace('btn-light', 'btn-danger');
-            teams[idB].score += params.lp;
-
-        } else if(btA.classList.contains('btn-success')) {
-            
-            btA.classList.replace('btn-success', 'btn-warning');
-            teams[idA].score += (params.dp - params.wp);
-            
-            btB.classList.replace('btn-danger', 'btn-warning');
-            teams[idB].score += (params.dp - params.lp);
-
-        } else if(btA.classList.contains('btn-warning')) {
-            
-            btA.classList.replace('btn-warning', 'btn-danger');
-            teams[idA].score += (params.lp - params.dp);
-            
-            btB.classList.replace('btn-warning', 'btn-success');            
-            teams[idB].score += (params.wp - params.dp);
-
-        } else if(btA.classList.contains('btn-danger')) {
-            
-            btA.classList.replace('btn-danger', 'btn-light');
-            teams[idA].score -= params.lp;
-            
-            btB.classList.replace('btn-success', 'btn-light');
-            teams[idB].score -= params.wp;
-        }
-
-        updateLeaderboard();
-    });
-
-    cell.appendChild(resultButton);
-
-    return cell;
+function updateParamsControls() {
+    document.querySelector('#setup').value = app.params.setup.toString();
+    document.querySelector('#takedown').value = app.params.takedown.toString();
+    document.querySelector('#breaks').value = app.params.breaks.toString();
+    document.querySelector('#end').value = app.params.end;
+    document.querySelector('#win_pts').value = app.params.win_pts.toString();
+    document.querySelector('#draw_pts').value = app.params.draw_pts.toString();
+    document.querySelector('#loss_pts').value = app.params.loss_pts.toString();
 }
 
-function disableBack() {
-    document.querySelector('#backBTN').disabled = true;
-}
+function updateTeamsControls(){
 
-function getInterval(round, nRounds){
-
-    console.table(params);
-
-    const endSplits = params.end.split(':');
-    const endDate = new Date();
-    endDate.setHours(parseInt(endSplits[0]));    
-    endDate.setMinutes(parseInt(endSplits[1])); 
-
-    const nowDate = new Date();
-    
-    const mmLeft = (endDate.getTime() - nowDate.getTime()) / (60 * 1000) - params.setup - params.takedown - params.breaks * (nRounds - 1);
-
-    const duration = Math.round(mmLeft / nRounds);
-
-    const fromStart = params.setup + (round - 1) * (duration + params.breaks);
-
-    const startDate = new Date(nowDate.getTime() + fromStart * 60 * 1000);
-
-    const stopDate = new Date(startDate.getTime() + duration * 60 * 1000);
-
-    const sh = String(startDate.getHours()).padStart(2, '0');
-    const sm = String(startDate.getMinutes()).padStart(2, '0');
-    const eh = String(stopDate.getHours()).padStart(2, '0');
-    const em = String(stopDate.getMinutes()).padStart(2, '0');
-
-    return `${sh}:${sm} - ${eh}:${em}`;
-
-}
-
-function updateLeaderboard(){
-    
-    lb = document.querySelector('#leaderboard');
-    
-    lb.innerHTML = '';
-
-    const lbTeams = [...teams]; 
-
-    lbTeams.sort(function(a, b){ return b.score - a.score; });
-
-    for( let i = 0; i < lbTeams.length; i++){
-        
-        const p = document.createElement('p');
-        const bg = (i % 2 == 0) ? 'lb-even' : 'lb-odd';
-        p.classList.add('row', 'mb-2', bg);
-
-        const teamCol = document.createElement('div');
-        teamCol.classList.add('col-10');
-        teamCol.innerHTML = lbTeams[i].name;
-
-        const scoreCol = document.createElement('div');
-        scoreCol.classList.add('col-2', 'text-end');
-        scoreCol.innerHTML = lbTeams[i].score;
-        
-        p.appendChild(teamCol);
-        p.appendChild(scoreCol);
-        lb.appendChild(p);
-    }
-}
-
-function generateDOM_teamsFormControls(){
+    const teamsFormControls = document.querySelector('#teamsFormControls');
+    teamsFormControls.innerHTML = '';
 
     let inputs = {};
 
@@ -356,7 +407,8 @@ function generateDOM_teamsFormControls(){
         inputs[`${i}`].classList.add('form-control');
         inputs[`${i}`].setAttribute('type', 'text');
         inputs[`${i}`].setAttribute('aria-label', `team ${i} input`);
-        inputs[`${i}`].setAttribute('id', `team${i}_INPUT`);
+        inputs[`${i}`].setAttribute('id', `team${i}_INPUT`);        
+        inputs[`${i}`].value = app.getTeamNameByCardinal(i);
 
         const jButton = document.createElement('button');
         jButton.classList.add('btn', 'btn-primary');
@@ -428,65 +480,210 @@ function generateDOM_teamsFormControls(){
         div.appendChild(tButton);
         div.appendChild(xButton);
 
-        document.querySelector('#teamsFormControls').appendChild(div);
+        teamsFormControls.appendChild(div);
     }
 }
 
-function evenArrayOfIndexes(){
-
-    const res = [...Array(teams.length).keys()];
-
-    if(teams.length % 2 != 0) {
-        // add the next index (i.e. teams.length) in second position (i.e. 1)
-        //(coz we wanna leave the pivot alone and match the fake team with the pivot team in the last round)
-        res.splice(1, 0, teams.length);
-    }
-
-    return res;
+function updateViews(){
+    updateFixturesView();
+    updateTableView();
 }
 
-function rr(indexes, round){
+function updateFixturesView(){
 
-    if(round > 1) {        
-        const tmp = indexes.pop();
-        indexes.splice(1, 0, tmp);
-        rr(indexes, round - 1);
+    const fixtures = document.getElementById('fixtures');    
+    fixtures.innerHTML = '';    
+
+    const nRounds = rounds_for(app.nTeams);
+    const nCourts = courts_for(app.nTeams);   
+
+    const resultButtons = {};
+
+    for (let r = 1; r <= nRounds; r++) {
+
+        const tableWrap = document.createElement('div'); 
+        tableWrap.classList.add('fxTableWrap');                       
+
+        const wall1 = document.createElement('div');
+        wall1.classList.add('rInterval');
+        wall1.innerHTML = app.getRoundInterval(r);
+
+        const table = document.createElement('div'); 
+        table.classList.add('fxTable');
+
+        const side1 = document.createElement('div');
+        side1.classList.add('row', 'gx-1', 'gx-md-2');        
+
+        const net = document.createElement('div');
+        net.classList.add('row');
+        net.innerHTML = `<div class="col"><hr class="my-0"></div>`;
+
+        const side2 = document.createElement('div');
+        side2.classList.add('row', 'gx-1', 'gx-md-2');   
+        
+        for(let c = 1; c <= nCourts; c++) {
+            side1.appendChild(createFixtureDiv(r, c, 1)); 
+            side2.appendChild(createFixtureDiv(r, c, 2)); 
+        }
+
+        table.appendChild(side1);
+        table.appendChild(net);
+        table.appendChild(side2);                 
+
+        const wall2 = document.createElement('div');
+        wall2.classList.add('row', 'gx-1', 'gx-md-2');
+        for(let c = 1; c <= nCourts; c++) { 
+            const cNumber = document.createElement('div');
+            cNumber.classList.add('col', 'cNumber');
+            cNumber.innerHTML = c;
+            wall2.appendChild(cNumber);
+        }
+        
+        tableWrap.appendChild(wall1);   
+        tableWrap.appendChild(table);
+        tableWrap.appendChild(wall2);   
+
+        fixtures.appendChild(tableWrap);
     }
 }
 
-function getTeamIndexFor(round, court, side) {
+function createFixtureDiv(r, c, s){    
+
+    const result = app.getFixtureResult(r, c);
+    const teamAName = app.getTeamNameFromFixture(r, c, s); 
+    const teamBName = app.getTeamNameFromFixture(r, c, 3-s); 
+
+    const fixtureDiv = document.createElement('div');
+    fixtureDiv.classList.add('col', 'p-1');
+
+    let btnResultClass;
+    if(result === '-') btnResultClass = 'btn-light';
+    else if(result === 'x') btnResultClass = 'btn-warning';
+    else if(parseInt(result) === s) btnResultClass = 'btn-success';
+    else btnResultClass = 'btn-danger';
+
+    resultButton = document.createElement('button');    
+    resultButton.setAttribute('id', `result_${r}_${c}_${s}_BTN`);            
+    resultButton.classList.add('btn', btnResultClass, 'btn-sm', 'p-1');
+    resultButton.setAttribute('type', 'button'); 
+
+    resultButton.innerHTML  = teamAName != null ? teamAName : '---';
+
+    if(teamAName == null || teamBName == null) resultButton.setAttribute('disabled', 'true');
+
+    resultButton.addEventListener('click', function (event) {
+
+        disableBack();
+
+        const btA = event.target;
+        const btB = document.querySelector(`#result_${r}_${c}_${(3-s)}_BTN`);  
+
+        if(btA.classList.contains('btn-light')) {            
+            app.setResult(r, c, `${s}`);            
+            btA.classList.replace('btn-light', 'btn-success');
+            btB.classList.replace('btn-light', 'btn-danger');
+
+        } else if(btA.classList.contains('btn-success')) {                      
+            app.setResult(r, c, 'x');            
+            btA.classList.replace('btn-success', 'btn-warning');            
+            btB.classList.replace('btn-danger', 'btn-warning');
+
+        } else if(btA.classList.contains('btn-warning')) {                     
+            app.setResult(r, c, `${3-s}`);            
+            btA.classList.replace('btn-warning', 'btn-danger');            
+            btB.classList.replace('btn-warning', 'btn-success'); 
+
+        } else if(btA.classList.contains('btn-danger')) {                   
+            app.setResult(r, c, '-');            
+            btA.classList.replace('btn-danger', 'btn-light');            
+            btB.classList.replace('btn-success', 'btn-light');
+        }
+
+        updateTableView();
+    });
+
+    fixtureDiv.appendChild(resultButton);
+
+    return fixtureDiv;
+}
+
+function updateTableView(){
     
-    const indexes = evenArrayOfIndexes(); 
+    lb = document.querySelector('#leaderboard');
+    lb.innerHTML = '';
 
-    rr(indexes, round);
+    const lbTeams = [...app.teams]; 
 
-    if(side == 1) return indexes[court - 1];
-    else return indexes[indexes.length - court];
-}
+    lbTeams.sort(function(a, b){ return b.score - a.score; });
 
-function getTeamName(i) {
-    if(i == teams.length) {
-        return null;
-    } else {
-        return teams[i].name;
+    for( let i = 0; i < lbTeams.length; i++){
+        
+        const p = document.createElement('p');
+        const bg = (i % 2 == 0) ? 'lb-even' : 'lb-odd';
+        p.classList.add('row', 'mb-2', bg);
+
+        const teamCol = document.createElement('div');
+        teamCol.classList.add('col-10');
+        teamCol.innerHTML = lbTeams[i].name;
+
+        const scoreCol = document.createElement('div');
+        scoreCol.classList.add('col-2', 'text-end');
+        scoreCol.innerHTML = lbTeams[i].score;
+        
+        p.appendChild(teamCol);
+        p.appendChild(scoreCol);
+        lb.appendChild(p);
     }
 }
 
-function resetControls(){
+function fetchParamsFromControls(){
+    return {
+        setup: parseInt(document.querySelector('#setup').value),
+        takedown: parseInt(document.querySelector('#takedown').value),
+        breaks: parseInt(document.querySelector('#breaks').value),
+        end: document.querySelector('#end').value,
+        win_pts: parseInt(document.querySelector('#win_pts').value),
+        draw_pts: parseInt(document.querySelector('#draw_pts').value),
+        loss_pts: parseInt(document.querySelector('#loss_pts').value)
+    };
+}
+
+function fetchTeamsFromControls(){
+    
+    const teamNames = [];
+    
+    // fetch team names from input controls
+    for(let i = 1; i <= 10; i++) {
+        input = document.querySelector(`\#team${i}_INPUT`);
+        if(input.value.trim() != '') {
+            teamNames.push(input.value.trim());
+        }
+    }
+
+    return teamNames;
+}
+
+function resetControls() {
 
     document.querySelector('#setup').value = PARAMS_DEFAULTS.SETUP;
     document.querySelector('#takedown').value = PARAMS_DEFAULTS.TAKEDOWN;
     document.querySelector('#breaks').value = PARAMS_DEFAULTS.BREAKS;
     document.querySelector('#end').value = PARAMS_DEFAULTS.END; 
 
-    document.querySelector('#wp').value = PARAMS_DEFAULTS.WIN_PTS;
-    document.querySelector('#dp').value = PARAMS_DEFAULTS.DRAW_PTS;
-    document.querySelector('#lp').value = PARAMS_DEFAULTS.LOSS_PTS;
+    document.querySelector('#win_pts').value = PARAMS_DEFAULTS.WIN_PTS;
+    document.querySelector('#draw_pts').value = PARAMS_DEFAULTS.DRAW_PTS;
+    document.querySelector('#loss_pts').value = PARAMS_DEFAULTS.LOSS_PTS;
 
     for(let i = 1; i <= 10; i++) { 
         document.querySelector(`\#team${i}_INPUT`).value = '';
     }
 }
+
+function disableBack() {
+    document.querySelector('#backBTN').disabled = true;
+}
+
+/*********************  page load ****************************************************/
 
 document.addEventListener("DOMContentLoaded", function() {
 
@@ -501,8 +698,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const lockCalcBTN = document.querySelector('#lockCalcBTN');    
     const lockBackBTN = document.querySelector('#lockBackBTN');    
     const calcBTN = document.querySelector('#calcBTN');
-
-    generateDOM_teamsFormControls();
 
     nextBTN.addEventListener('click', function (event) {
         frontendTab.show();
@@ -555,16 +750,17 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     calcBTN.addEventListener('click', function (event) {
-        frontendTab.show();
-        document.getElementById('fixtures').innerHTML = '';        
-        document.getElementById('leaderboard').innerHTML = '';
+
+        frontendTab.show();   
         backBTN.disabled = true;
         calcBTN.disabled = true;
-        updateParams();
-        fetchTeams();
-        generateFixtures();
-        updateLeaderboard();
+
+        app.update(fetchParamsFromControls(), fetchTeamsFromControls());        
+        updateControls();
+        updateViews();
     });  
 
-    resetControls();
+    app.syncWithStorage();
+    updateControls();
+    updateViews();
  });
