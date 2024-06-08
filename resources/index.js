@@ -614,9 +614,9 @@ function createFixtureDiv(r, c, s){
         const btA = event.target;
         const btB = document.querySelector(`#result_${r}_${c}_${(3-s)}_BTN`);  
 
-        // remove the old bell
-        let oldBell = document.querySelector('#bell');
-        if(oldBell) oldBell.remove();
+        // remove the old thumb
+        let oldThumb = document.querySelector('#thumb');
+        if(oldThumb) oldThumb.remove();
 
         if(btA.classList.contains('btn-light')) {            
             app.setResult(r, c, `${s}`);            
@@ -639,8 +639,8 @@ function createFixtureDiv(r, c, s){
             btB.classList.replace('btn-success', 'btn-light');
         }        
 
-        // create and append the new bell
-        appendNewBellFor(fixtureDiv);
+        // create and append the new thumb
+        appendNewThumbFor(fixtureDiv);
         
         updateTableView();
     });
@@ -650,22 +650,22 @@ function createFixtureDiv(r, c, s){
     return fixtureDiv;
 }
 
-function appendNewBellFor(blockEle){
-    const newBell = document.createElement('div');  
-    newBell.setAttribute('id', 'bell');   
-    newBell.classList.add('bell', 'position-absolute');
-    newBell.setAttribute('style', `font-size: 1em; transform: rotate(-45deg); opacity: 0.50;`);
-    newBell.innerHTML = `<i class="bi bi-bell-fill"></i>`;
-    blockEle.appendChild(newBell);
+function appendNewThumbFor(blockEle){
+    const newThumb = document.createElement('div');  
+    newThumb.setAttribute('id', 'thumb');   
+    newThumb.classList.add('thumb', 'position-absolute');
+    newThumb.setAttribute('style', `font-size: 1.2em; transform: rotate(0deg); opacity: 0.50;`);
+    newThumb.innerHTML = `<i class="bi bi-hand-thumbs-up"></i>`;
+    blockEle.appendChild(newThumb);
 
-    // animate the bell
+    // animate the thumb
     const steps = [
-        {rot: 0, siz: 1.2, opa: 0.55}, {rot: -45, siz: 1.4, opa: 0.60}, {rot: 0, siz: 1.6, opa: 0.65}, {rot: -45, siz: 1.8, opa: 0.70}, {rot: 0, siz: 1.8, opa: 0.75},
-        {rot: -45, siz: 1.8, opa: 0.80}, {rot: 0, siz: 1.6, opa: 0.85}, {rot: -45, siz: 1.4, opa: 0.90}, {rot: 0, siz: 1.2, opa: 0.95}, {rot: -45, siz: 1.0, opa: 1.00}
+        {siz: 1.4, opa: 0.55}, {siz: 1.6, opa: 0.60}, {siz: 1.8, opa: 0.65}, {siz: 2.0, opa: 0.70}, {siz: 2.0, opa: 0.75},
+        {siz: 2.0, opa: 0.80}, {siz: 1.8, opa: 0.85}, {siz: 1.6, opa: 0.90}, {siz: 1.4, opa: 0.95}, {siz: 1.2, opa: 1.00}
     ];
     for(let i = 0; i < steps.length; i++){
         setTimeout(() => {                
-            newBell.setAttribute('style', `font-size: ${steps[i].siz}em; transform: rotate(${steps[i].rot}deg); opacity: ${steps[i].opa};`);
+            newThumb.setAttribute('style', `font-size: ${steps[i].siz}em; transform: rotate(0deg); opacity: ${steps[i].opa};`);
         }, i * 50);
     }
 }
