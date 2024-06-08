@@ -22,6 +22,11 @@ h2, h3, legend, label {
     margin: 0;
 }
 
+#editHeaderBTN {
+    font-size: 0.8em;    
+    color: #B65300;
+}
+
 #main {    
     background-color: #FF7400; 
     border-bottom: 0.25em solid #FF7400;
@@ -96,6 +101,10 @@ h2, h3, legend, label {
         max-height: calc(100vh - 110px);
         overflow-x: hidden;
         overflow-y: auto;
+    }    
+
+    #headerINPUT {
+        max-width: 90%;
     }
 
 }

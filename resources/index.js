@@ -1,5 +1,7 @@
 /********************* constants *************************************************/
 
+const DEFAULT_HEADER = '4v4 Mixed - Jets Monday Session';
+
 const DEFAULT_TEAM_NAME_PREFIX = 'Jets';
 
 const SET_OF = {
@@ -178,6 +180,8 @@ function localStorage_setObject(key, value) {
 
 const app = {
 
+    header : null,
+
     params : {
         setup : null,
         takedown : null,
@@ -195,6 +199,13 @@ const app = {
     tab : 'backend', // possible values: 'backend', 'frontend'
 
     syncWithStorage : function() {
+
+        this.header = localStorage_getItem_or_string('header', DEFAULT_HEADER);
+
+        // if no header in the storage, then initialize it from this object
+        if(!localStorage.getItem('header'))
+            localStorage.setItem('header', this.header);
+
         this.params.setup = localStorage_getItem_or_int('setup', PARAMS_DEFAULTS.SETUP);
         this.params.takedown = localStorage_getItem_or_int('takedown', PARAMS_DEFAULTS.TAKEDOWN);
         this.params.breaks = localStorage_getItem_or_int('breaks', PARAMS_DEFAULTS.BREAKS);
@@ -234,10 +245,14 @@ const app = {
             localStorage.setItem('tab', this.tab);
     },
 
-    update : function(paramValues, teamNames) {
+    update : function(headerValue, paramValues, teamNames) {
 
         // clear the storage.....................
         localStorage.clear();
+
+        // update header.........................
+        this.header = headerValue;
+        localStorage.setItem('header', this.header);
 
         // update params.........................
         this.params.setup = paramValues.setup;
@@ -280,6 +295,11 @@ const app = {
         }
 
         this.setStorageFixturesFromThis();
+    },
+
+    setHeader : function(headerValue) {
+        this.header = headerValue;        
+        localStorage.setItem('header', this.header);
     },
 
     switchTabTo : function(tab) {
@@ -384,6 +404,11 @@ const app = {
 }
 
 /********************* UI utils ****************************************************/
+
+function updateHeader() {      
+    document.querySelector('#header_h1').innerHTML = app.header;   
+    document.querySelector('#headerINPUT').value = app.header;   
+}
 
 function updateControls() {
     updateParamsControls();
@@ -701,6 +726,10 @@ function fetchTeamsFromControls(){
     return teamNames;
 }
 
+function fetchHeaderFromUI(){
+    return document.querySelector('#header_h1').innerHTML;
+}
+
 function resetControls() {
 
     document.querySelector('#setup').value = PARAMS_DEFAULTS.SETUP;
@@ -726,8 +755,10 @@ function disableBack() {
 document.addEventListener("DOMContentLoaded", function() {
 
     const backendTab = new bootstrap.Tab(document.querySelector('#backendTab'));
-    const frontendTab = new bootstrap.Tab(document.querySelector('#frontendTab'));
-    
+    const frontendTab = new bootstrap.Tab(document.querySelector('#frontendTab'));    
+
+    const editHeaderBTN = document.querySelector('#editHeaderBTN');
+    const saveHeaderBTN = document.querySelector('#saveHeaderBTN');
     const nextBTN = document.querySelector('#nextBTN');
     const backBTN = document.querySelector('#backBTN');
     const resetBTN = document.querySelector('#resetBTN');
@@ -736,6 +767,18 @@ document.addEventListener("DOMContentLoaded", function() {
     const lockCalcBTN = document.querySelector('#lockCalcBTN');    
     const lockBackBTN = document.querySelector('#lockBackBTN');    
     const calcBTN = document.querySelector('#calcBTN');
+
+    editHeaderBTN.addEventListener('click', function (event) { 
+        document.querySelector('#header_h1_div').classList.add('d-none');
+        document.querySelector('#header_form').classList.remove('d-none');
+    }); 
+
+    saveHeaderBTN.addEventListener('click', function (event) { 
+        app.setHeader(document.querySelector('#headerINPUT').value.trim());    
+        document.querySelector('#header_h1').innerHTML = app.header;
+        document.querySelector('#header_form').classList.add('d-none');
+        document.querySelector('#header_h1_div').classList.remove('d-none');
+    });       
 
     nextBTN.addEventListener('click', function (event) {    
         backBTN.disabled = true;
@@ -792,7 +835,7 @@ document.addEventListener("DOMContentLoaded", function() {
     calcBTN.addEventListener('click', function (event) {
         backBTN.disabled = true;
         calcBTN.disabled = true;
-        app.update(fetchParamsFromControls(), fetchTeamsFromControls());    
+        app.update(fetchHeaderFromUI(), fetchParamsFromControls(), fetchTeamsFromControls());    
         app.switchTabTo('frontend');   
         frontendTab.show();       
         updateControls();
@@ -801,6 +844,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     app.syncWithStorage();
     if(app.tab === 'backend') backendTab.show(); else frontendTab.show();
+    updateHeader();
     updateControls();
     updateViews();
  });
