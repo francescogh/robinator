@@ -564,8 +564,8 @@ function createFixtureDiv(r, c, s){
     const teamAName = app.getTeamNameFromFixture(r, c, s); 
     const teamBName = app.getTeamNameFromFixture(r, c, 3-s); 
 
-    const fixtureDiv = document.createElement('div');
-    fixtureDiv.classList.add('col', 'p-1');
+    const fixtureDiv = document.createElement('div');   
+    fixtureDiv.classList.add('col', 'p-1', 'position-relative');
 
     let btnResultClass;
     if(result === '-') btnResultClass = 'btn-light';
@@ -589,6 +589,10 @@ function createFixtureDiv(r, c, s){
         const btA = event.target;
         const btB = document.querySelector(`#result_${r}_${c}_${(3-s)}_BTN`);  
 
+        // remove the old bell
+        let oldBell = document.querySelector('#bell');
+        if(oldBell) oldBell.remove();
+
         if(btA.classList.contains('btn-light')) {            
             app.setResult(r, c, `${s}`);            
             btA.classList.replace('btn-light', 'btn-success');
@@ -608,14 +612,37 @@ function createFixtureDiv(r, c, s){
             app.setResult(r, c, '-');            
             btA.classList.replace('btn-danger', 'btn-light');            
             btB.classList.replace('btn-success', 'btn-light');
-        }
+        }        
 
+        // create and append the new bell
+        appendNewBellFor(fixtureDiv);
+        
         updateTableView();
     });
 
     fixtureDiv.appendChild(resultButton);
 
     return fixtureDiv;
+}
+
+function appendNewBellFor(blockEle){
+    const newBell = document.createElement('div');  
+    newBell.setAttribute('id', 'bell');   
+    newBell.classList.add('bell', 'position-absolute');
+    newBell.setAttribute('style', `font-size: 1em; transform: rotate(-45deg); opacity: 0.50;`);
+    newBell.innerHTML = `<i class="bi bi-bell-fill"></i>`;
+    blockEle.appendChild(newBell);
+
+    // animate the bell
+    const steps = [
+        {rot: 0, siz: 1.2, opa: 0.55}, {rot: -45, siz: 1.4, opa: 0.60}, {rot: 0, siz: 1.6, opa: 0.65}, {rot: -45, siz: 1.8, opa: 0.70}, {rot: 0, siz: 1.8, opa: 0.75},
+        {rot: -45, siz: 1.8, opa: 0.80}, {rot: 0, siz: 1.6, opa: 0.85}, {rot: -45, siz: 1.4, opa: 0.90}, {rot: 0, siz: 1.2, opa: 0.95}, {rot: -45, siz: 1.0, opa: 1.00}
+    ];
+    for(let i = 0; i < steps.length; i++){
+        setTimeout(() => {                
+            newBell.setAttribute('style', `font-size: ${steps[i].siz}em; transform: rotate(${steps[i].rot}deg); opacity: ${steps[i].opa};`);
+        }, i * 50);
+    }
 }
 
 function updateTableView(){

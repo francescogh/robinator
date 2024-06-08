@@ -37,6 +37,16 @@ h2, h3, legend, label {
     text-align: center;
 } 
 
+#fixtures .bell {
+    color: #B65300;
+    width: 1em;
+    line-height: 1em;
+    padding: 0;
+    margin: 0;
+    right: 0.75em;
+    top: calc(50% - 0.5em);
+}
+
 #leaderboard{
     background-color: #FF953D;
     font-size: 1.2em;
