@@ -177,6 +177,7 @@ function localStorage_setObject(key, value) {
 /********************* app object ****************************************************/
 
 const app = {
+
     params : {
         setup : null,
         takedown : null,
@@ -185,10 +186,13 @@ const app = {
         win_pts : null,
         draw_pts : null,
         loss_pts :null
-    },   
+    }, 
+
     nTeams : 0, 
     teams : [],     // one team example: {name: "Jets 1", score: 10}
-    fixtures : [],  // one fixture example: {r:3, c:1, team1Id: 0, team2Id: 3, result: 'x'} // possible results are '1', 'x', '2', '-'. // teamNId : null in case of the placeholder team
+    fixtures : [],  // one fixture example: {r:3, c:1, team1Id: 0, team2Id: 3, result: 'x'} // possible results: '1', 'x', '2', '-' // teamNId : null in case of the placeholder team
+
+    tab : 'backend', // possible values: 'backend', 'frontend'
 
     syncWithStorage : function() {
         this.params.setup = localStorage_getItem_or_int('setup', PARAMS_DEFAULTS.SETUP);
@@ -207,7 +211,7 @@ const app = {
 
         // if no nTeams in the storage, then initialize it from this object
         if(!localStorage.getItem('nTeams'))
-            this.setStorageNTeamsFromThis();
+            localStorage_setString('nTeams', this.nTeams);
 
         if(this.nTeams > 0) {
 
@@ -222,6 +226,12 @@ const app = {
                 }
             }
         }
+
+        this.tab = localStorage_getItem_or_string('tab', 'backend');
+
+        // if no tab in the storage, then initialize it from this object
+        if(!localStorage.getItem('tab'))
+            localStorage.setItem('tab', this.tab);
     },
 
     update : function(paramValues, teamNames) {
@@ -241,7 +251,7 @@ const app = {
 
         // update nTeams.........................
         this.nTeams = teamNames.length;
-        this.setStorageNTeamsFromThis();
+        localStorage_setString('nTeams', this.nTeams);
 
         // update teams..........................
 
@@ -270,6 +280,11 @@ const app = {
         }
 
         this.setStorageFixturesFromThis();
+    },
+
+    switchTabTo : function(tab) {
+        this.tab = tab;
+        localStorage.setItem('tab', tab);
     },
 
     setResult : function(r, c, newRes) {
@@ -351,10 +366,6 @@ const app = {
         localStorage_setString('win_pts', this.params.win_pts);
         localStorage_setString('draw_pts', this.params.draw_pts);
         localStorage_setString('loss_pts', this.params.loss_pts);
-    },
-
-    setStorageNTeamsFromThis : function() {
-        localStorage_setString('nTeams', this.nTeams);
     },
 
     setStorageTeamsFromThis : function() {
@@ -699,16 +710,18 @@ document.addEventListener("DOMContentLoaded", function() {
     const lockBackBTN = document.querySelector('#lockBackBTN');    
     const calcBTN = document.querySelector('#calcBTN');
 
-    nextBTN.addEventListener('click', function (event) {
-        frontendTab.show();
+    nextBTN.addEventListener('click', function (event) {    
         backBTN.disabled = true;
-        calcBTN.disabled = true;
+        calcBTN.disabled = true;    
+        app.switchTabTo('frontend');  
+        frontendTab.show();
     });    
 
-    backBTN.addEventListener('click', function (event) {
-        backendTab.show();
+    backBTN.addEventListener('click', function (event) {   
         backBTN.disabled = true;
-        calcBTN.disabled = true;
+        calcBTN.disabled = true;   
+        app.switchTabTo('backend');  
+        backendTab.show();
     });
 
     resetBTN.addEventListener('click', function (event) {
@@ -750,17 +763,17 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     calcBTN.addEventListener('click', function (event) {
-
-        frontendTab.show();   
         backBTN.disabled = true;
         calcBTN.disabled = true;
-
-        app.update(fetchParamsFromControls(), fetchTeamsFromControls());        
+        app.update(fetchParamsFromControls(), fetchTeamsFromControls());    
+        app.switchTabTo('frontend');   
+        frontendTab.show();       
         updateControls();
         updateViews();
     });  
 
     app.syncWithStorage();
+    if(app.tab === 'backend') backendTab.show(); else frontendTab.show();
     updateControls();
     updateViews();
  });
