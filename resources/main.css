@@ -95,6 +95,36 @@ h2, h3, legend, label {
     background-color: transparent;
 }
 
+.autocomplete {
+    position: relative;
+}
+
+.autocompleteList {
+  position: absolute;
+  border: 1px solid #CCC;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  top: 100%;
+  left: 2rem;
+}
+
+.autocompleteList div {
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  background-color: #FFF;
+  border-bottom: 1px solid #CCC;
+}
+
+.autocompleteList div:hover {
+  background-color: #EEE;
+}
+
+.autocomplete-active {
+  background-color: #0D6EFD !important;
+  color: #FFF;
+}
+
 @media screen and (min-width: 768px) {
 
     #fixtures {

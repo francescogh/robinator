@@ -11,10 +11,10 @@ const SET_OF = {
     INTERIECTIONS_BF : ['Oh', 'Forza', 'Ready'],   
     INTERIECTIONS_AF : ['Yay', 'Woppa', 'Go'], 
     CLUBS : ['JETS', 'METS', 'NUVOC', 'QMU'],
-    ADGECTIVES : ['Bad', 'Fab', 'Winter', 'Sandy', 'Smoky', 'Smoking', 'Extra Virgin', 'Knackered', 'Polar', 'Tie-Dye', 'Suede', 'Electric', 'Chemical', 'Hardcore', 'Wee', 'Leather', 'Dark', 'Devil', 'Ready', 'Bouncy', 'Peppy', 'Snake Print', 'Bow-Tie', 'Original', 'Scottish', 'Irish', 'Welsh', 'Mexican', 'Spanish', 'Fluffy' ,'Spunky', 'Exotic', 'Hoppy', 'Tannic', 'Crispy'],
-    QUALIFICATIVES : ['Net', 'Ball', 'Volley', 'Radio', 'Morning', 'Garden', 'Karate', 'Judo'],
-    SUBSTANTIVES_PL_1 : ['Elbows', 'Wasps', 'Ninjas', 'Setters', 'Spikes', 'Tippers', 'Digs', 'Flags', 'Thunders', 'Bros', 'Clouds', 'Jets', 'Chocolates', 'Cars', 'Sushi', 'Spaghetti', 'Rockets', 'Sycamores', 'Shrimps', 'Dogs', 'Heroes', 'Queens', 'Pints', 'Monkeys', 'Stars', 'Dolphins', 'Peas', 'Ladybugs', 'Thistles', 'Drums', 'Eggs', 'Nachos', 'Eyes', 'Wolves', 'Nomads', 'Giants', 'Lions', 'Rockers', 'Vipers', 'Blazers', 'Glasses', 'Wizards', 'Guns', 'Echoes', 'Deserts', 'Mountains'],
-    SUBSTANTIVES_PL_2 : ['Chips', 'Hornets', 'Deers', 'Comrades', 'Spikers', 'Tips', 'Sets', 'Diggers', 'Cards', 'Lightnings', 'Sisses', 'Candies', 'Confetti', 'Ships', 'Cycles', 'Feathers', 'Chefs', 'Mushrooms', 'Pines', 'Llamas', 'Devils', 'Kings', 'Hippos', 'Hills', 'Beans', 'Stripes', 'Barrels', 'Sharks', 'Snails', 'Apricots', 'Dwarves', 'Hats', 'Horses', 'Supremes', 'Sirens', 'Tigers', 'Neckties', 'Buttons', 'Drivers', 'Gators', 'Boots', 'Books', 'Lizards', 'Roses', 'Mirrors', 'Lakes', 'Waterfalls'],
+    ADGECTIVES : ['Authentic', 'Ambitious', 'Bad', 'Fab', 'Legendary', 'Winter', 'Sandy', 'Smoky', 'Smoking', 'Extra Virgin', 'Knackered', 'Polar', 'Tie-Dye', 'Suede', 'Electric', 'Chemical', 'Hardcore', 'Wee', 'Leather', 'Dark', 'Devil', 'Ready', 'Bouncy', 'Peppy', 'Snake Print', 'Bow-Tie', 'Original', 'Scottish', 'Irish', 'Welsh', 'Mexican', 'Spanish', 'Fluffy' ,'Spunky', 'Exotic', 'Hoppy', 'Tannic', 'Crispy'],
+    QUALIFICATIVES : ['Net', 'Ball', 'Volley', 'Airborne', 'Aerial ', 'Radio', 'Morning', 'Garden', 'Karate', 'Judo'],
+    SUBSTANTIVES_PL_1 : ['Elbows', 'Wasps', 'Ninjas', 'Turtles', 'Setters', 'Spikes', 'Tippers', 'Digs', 'Flags', 'Thunders', 'Bros', 'Clouds', 'Jets', 'Chocolates', 'Cars', 'Sushi', 'Spaghetti', 'Rockets', 'Sycamores', 'Shrimps', 'Dogs', 'Heroes', 'Queens', 'Pints', 'Monkeys', 'Stars', 'Dolphins', 'Peas', 'Ladybugs', 'Thistles', 'Drums', 'Eggs', 'Nachos', 'Eyes', 'Wolves', 'Nomads', 'Giants', 'Lions', 'Rockers', 'Vipers', 'Blazers', 'Glasses', 'Wizards', 'Guns', 'Echoes', 'Deserts', 'Mountains'],
+    SUBSTANTIVES_PL_2 : ['Chips', 'Hornets', 'Deers', 'Comrades', 'Spikers', 'Tips', 'Sets', 'Aces', 'Diggers', 'Cards', 'Lightnings', 'Sisses', 'Candies', 'Confetti', 'Ships', 'Cycles', 'Feathers', 'Chefs', 'Mushrooms', 'Pines', 'Llamas', 'Devils', 'Kings', 'Hippos', 'Hills', 'Beans', 'Stripes', 'Barrels', 'Sharks', 'Snails', 'Apricots', 'Dwarves', 'Hats', 'Horses', 'Supremes', 'Sirens', 'Tigers', 'Neckties', 'Buttons', 'Drivers', 'Gators', 'Boots', 'Books', 'Lizards', 'Roses', 'Mirrors', 'Lakes', 'Waterfalls'],
     SUBSTANTIVES_PL_3 : ['Hammers', 'Ladders', 'Wrenches', 'Prunes', 'Bananas', 'Paws', 'Footsteps', 'Candles', 'Mondays', 'Fridays', 'Sundays'],
     SUBSTANTIVES_SN : ['Octopus', 'Rhabarberbar', 'Nessy', 'Star', 'Force', 'Illusion', 'Jungle', 'Olive Oil', 'Petroleum', 'Recovery', 'Burrito', 'Pasta', 'Caravan', 'Gnome', 'Recipe', 'Storm', 'Flag'],
     COMPLIMENTS_FOR_IN : ['America', 'Japan', 'Scotland', 'Iceland', 'The Meadow', 'Las Vegas', 'Florida', 'Olympus', 'Burma', 'June', 'The Rain', 'The Future', 'The Box', 'The Groove'],
@@ -62,6 +62,31 @@ const NAME_TYPES = [
     'ADGECTIVES + SUBSTANTIVES_PL_1 + IN + COMPLIMENTS_FOR_IN',
     'COLORS + SUBSTANTIVES_PL_2 + IN + COMPLIMENTS_FOR_IN',
     'COLORS + SUBSTANTIVES_SN + IN + COMPLIMENTS_FOR_IN'
+];
+
+const CUSTOM_NAMES = [
+    'Above the Net', 'Aces of Spikes', 'Airborne Attackers',
+    'Ball Collective', 'Ball Devils', 'Blazers And Llamas', 
+    'Chemical Burrito',
+    'Daisy At The Drums',
+    'Exotic Wee Hippos',
+    'France\'s Pasta', 'Forza METS Go',
+    'Garden Brigade',
+    'Hardcore Diggers', 'Hoppy Hippos',
+    'Irish Diggers Club',
+    'Jeremiah\'s Illusion', 'Jets And Giants', 'JETS Bananas', 'Jets Fury', 'JETS Ninjas', 'Jets \'N\' Beans',
+    'Karate Ladybugs', 'Knackered Smoky Beans',
+    'Laser Spikers', 'Legendary Aces', 
+    'Mars Recipe', 'METS Hammers', 'METS Lizards', 'Morning Chocolates Yay',
+    'Net Mushrooms', 'Net Spaghetti', 'NUVOC Dogs',
+    'Oil 66',
+    'Pink Apricots', 'Pints & Olive Oil', 'Purple Mexican Vipers',
+    'QMU Lions', 'QMU Tippers',
+    'Ready NUVOC Go', 'Red Leather Shrimps',
+    'Sandy Fridays', 'Stars & Mirrors', 'Spunky Wrenches',
+    'Tie-Dye Monkeys From Burma', 'Tie-Dye Spunky Cycles',
+    'Unleashed Fury Aces',
+    'Volley Metaverse', 'Volley Tigers'
 ];
 
 const PARAMS_DEFAULTS = {
@@ -438,13 +463,14 @@ function updateTeamsControls(){
         span.classList.add('input-group-text');
         span.setAttribute('style', `font-family:Consolas, monospace;`);
         span.innerHTML = (i < 10) ? `&nbsp;${i}` : `${i}`;
-       
+  
         inputs[`${i}`] = document.createElement('input');
         inputs[`${i}`].classList.add('form-control');
         inputs[`${i}`].setAttribute('type', 'text');
         inputs[`${i}`].setAttribute('aria-label', `team ${i} input`);
         inputs[`${i}`].setAttribute('id', `team${i}_INPUT`);        
         inputs[`${i}`].value = app.getTeamNameByCardinal(i);
+        autocomplete(inputs[`${i}`], CUSTOM_NAMES);
 
         const jButton = document.createElement('button');
         jButton.classList.add('btn', 'btn-primary');
@@ -507,7 +533,7 @@ function updateTeamsControls(){
         });              
 
         const div = document.createElement('div');
-        div.classList.add('input-group', 'input-group-sm', 'mb-2');
+        div.classList.add('input-group', 'input-group-sm', 'mb-2', 'autocomplete');
         div.appendChild(span);
         div.appendChild(inputs[`${i}`]);
         div.appendChild(jButton);
