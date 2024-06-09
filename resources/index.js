@@ -284,6 +284,7 @@ const app = {
         const res = [];
 
         let rem = 100 - newNames.length;
+        let af = 0;
 
         for(let i = ln - 1; i >= 0; i--) {
             const currName = this.favTeamNames[i].name;
@@ -291,12 +292,13 @@ const app = {
                 // we found a duplicate, we can delete the old one             
                 out.push(this.favTeamNames[i]);
                 // the new one must be really useful, bubble it till the end of the pile (so it will last longer)
-                for(let j = 0; j < ins.length - 1; j++) {
+                for(let j = 0; j < ins.length - 1 - af; j++) {
                     if(ins[j].name.match(currName)) {
                         ins[j].name = ins[j+1].name; 
                         ins[j+1].name = currName;
                     }
                 }
+                af++;
             } else if (rem <= 0) {
                 // no more space among the 100 favourites
                 out.push(this.favTeamNames[i]);
