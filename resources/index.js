@@ -1,4 +1,5 @@
 /********************* constants *************************************************/
+const VERSION = 1.4;
 
 const DEFAULT_HEADER = '4v4 Mixed - Jets Monday Session';
 
@@ -98,6 +99,7 @@ const PARAMS_DEFAULTS = {
     DRAW_PTS : 1,
     LOSS_PTS : 0
 };
+
 
 /********************* general utils **********************************************************/
 
@@ -201,7 +203,8 @@ function localStorage_setObject(key, value) {
     return localStorage.setItem(key, JSON.stringify(value));
 }
 
-/********************* app object ****************************************************/
+
+/************************** app object *********************************************************/
 
 const app = {
 
@@ -793,6 +796,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const lockCalcBTN = document.querySelector('#lockCalcBTN');    
     const lockBackBTN = document.querySelector('#lockBackBTN');    
     const calcBTN = document.querySelector('#calcBTN');
+
+    document.querySelector('#version').innerHTML = VERSION;
 
     editHeaderBTN.addEventListener('click', function (event) { 
         document.querySelector('#header_h1_div').classList.add('d-none');
