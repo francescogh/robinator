@@ -13,7 +13,7 @@ const SET_OF = {
     INTERIECTIONS_AF : ['Yay', 'Woppa', 'Go'], 
     CLUBS : ['JETS', 'METS', 'NUVOC', 'QMU'],
     ADGECTIVES : ['Authentic', 'Ambitious', 'Bad', 'Fab', 'Legendary', 'Winter', 'Sandy', 'Smoky', 'Smoking', 'Extra Virgin', 'Knackered', 'Polar', 'Tie-Dye', 'Suede', 'Electric', 'Chemical', 'Hardcore', 'Wee', 'Leather', 'Dark', 'Devil', 'Ready', 'Bouncy', 'Peppy', 'Snake Print', 'Bow-Tie', 'Original', 'Scottish', 'Irish', 'Welsh', 'Mexican', 'Spanish', 'Fluffy' ,'Spunky', 'Exotic', 'Hoppy', 'Tannic', 'Crispy'],
-    QUALIFICATIVES : ['Net', 'Ball', 'Volley', 'Airborne', 'Aerial ', 'Radio', 'Morning', 'Garden', 'Karate', 'Judo'],
+    QUALIFICATIVES : ['Net', 'Ball', 'Volley', 'Airborne', 'Aerial', 'Radio', 'Morning', 'Garden', 'Karate', 'Judo'],
     SUBSTANTIVES_PL_1 : ['Elbows', 'Wasps', 'Ninjas', 'Turtles', 'Setters', 'Spikes', 'Tippers', 'Digs', 'Flags', 'Thunders', 'Bros', 'Clouds', 'Jets', 'Chocolates', 'Cars', 'Sushi', 'Spaghetti', 'Rockets', 'Sycamores', 'Shrimps', 'Dogs', 'Heroes', 'Queens', 'Pints', 'Monkeys', 'Stars', 'Dolphins', 'Peas', 'Ladybugs', 'Thistles', 'Drums', 'Eggs', 'Nachos', 'Eyes', 'Wolves', 'Nomads', 'Giants', 'Lions', 'Rockers', 'Vipers', 'Blazers', 'Glasses', 'Wizards', 'Guns', 'Echoes', 'Deserts', 'Mountains'],
     SUBSTANTIVES_PL_2 : ['Chips', 'Hornets', 'Deers', 'Comrades', 'Spikers', 'Tips', 'Sets', 'Aces', 'Diggers', 'Cards', 'Lightnings', 'Sisses', 'Candies', 'Confetti', 'Ships', 'Cycles', 'Feathers', 'Chefs', 'Mushrooms', 'Pines', 'Llamas', 'Devils', 'Kings', 'Hippos', 'Hills', 'Beans', 'Stripes', 'Barrels', 'Sharks', 'Snails', 'Apricots', 'Dwarves', 'Hats', 'Horses', 'Supremes', 'Sirens', 'Tigers', 'Neckties', 'Buttons', 'Drivers', 'Gators', 'Boots', 'Books', 'Lizards', 'Roses', 'Mirrors', 'Lakes', 'Waterfalls'],
     SUBSTANTIVES_PL_3 : ['Hammers', 'Ladders', 'Wrenches', 'Prunes', 'Bananas', 'Paws', 'Footsteps', 'Candles', 'Mondays', 'Fridays', 'Sundays'],
@@ -63,31 +63,6 @@ const NAME_TYPES = [
     'ADGECTIVES + SUBSTANTIVES_PL_1 + IN + COMPLIMENTS_FOR_IN',
     'COLORS + SUBSTANTIVES_PL_2 + IN + COMPLIMENTS_FOR_IN',
     'COLORS + SUBSTANTIVES_SN + IN + COMPLIMENTS_FOR_IN'
-];
-
-const CUSTOM_NAMES = [
-    'Above the Net', 'Aces of Spikes', 'Airborne Attackers',
-    'Ball Collective', 'Ball Devils', 'Blazers And Llamas', 
-    'Chemical Burrito',
-    'Daisy At The Drums',
-    'Exotic Wee Hippos',
-    'France\'s Pasta', 'Forza METS Go',
-    'Garden Brigade',
-    'Hardcore Diggers', 'Hoppy Hippos',
-    'Irish Diggers Club',
-    'Jeremiah\'s Illusion', 'Jets And Giants', 'JETS Bananas', 'Jets Fury', 'JETS Ninjas', 'Jets \'N\' Beans',
-    'Karate Ladybugs', 'Knackered Smoky Beans',
-    'Laser Spikers', 'Legendary Aces', 
-    'Mars Recipe', 'METS Hammers', 'METS Lizards', 'Morning Chocolates Yay',
-    'Net Mushrooms', 'Net Spaghetti', 'NUVOC Dogs',
-    'Oil 66',
-    'Pink Apricots', 'Pints & Olive Oil', 'Purple Mexican Vipers',
-    'QMU Lions', 'QMU Tippers',
-    'Ready NUVOC Go', 'Red Leather Shrimps',
-    'Sandy Fridays', 'Stars & Mirrors', 'Spunky Wrenches',
-    'Tie-Dye Monkeys From Burma', 'Tie-Dye Spunky Cycles',
-    'Unleashed Fury Aces',
-    'Volley Metaverse', 'Volley Tigers'
 ];
 
 const PARAMS_DEFAULTS = {
@@ -203,12 +178,81 @@ function localStorage_setObject(key, value) {
     return localStorage.setItem(key, JSON.stringify(value));
 }
 
+/************************** idb ***************************************************************/
+
+DB_NAME = 'Robinator';
+DB_VERSION = 1;
+
+const idbHelper = {
+
+    connection : null,
+
+    openConnection : async function() {
+
+        this.connection = await idb.openDB(DB_NAME, DB_VERSION, {
+
+            upgrade(db, oldVersion, newVersion, transaction, event) {
+                console.log(`idbHelper: indexedDB needed an ugrade from version ${oldVersion} to version ${newVersion}`);
+
+                switch(newVersion) {     
+
+                    case 1:                     
+                        // create store favourite_team_name (id, name)
+                        db.createObjectStore('favourite_team_name', { keyPath: 'id' });
+
+                        // ..and put some initial values
+                        transaction.addEventListener('complete', function(transComplEvent){
+                            for(let i = 1; i <= 10; i++) {                                
+                                db.add('favourite_team_name', {id: i, name: `${DEFAULT_TEAM_NAME_PREFIX} ${i}`});
+                            }
+                        });
+                        break;
+                }
+            },
+
+            blocked(currentVersion, blockedVersion, event) {
+                console.log("Please close all other tabs with this site open!");
+            },
+
+            blocking(currentVersion, blockedVersion, event) {                
+                db.close();
+                console.log("A new version of this page is ready. Please reload or close this tab!");
+            },
+
+            terminated() {},
+
+        });
+    },
+
+    getFavouriteTeamNames : async function(){
+        await this.openConnection();
+        const names = await this.connection.getAll('favourite_team_name');
+        this.connection.close();
+        return names;
+    },
+
+    addOrRemoveFavouriteTeamNames : async function(ins, out){
+        await this.openConnection(); 
+
+        for(let i = 0; i < out.length; i++) {            
+            await this.connection.delete('favourite_team_name', out[i].id);
+        }
+
+        for(let i = 0; i < ins.length; i++) {                           
+            await this.connection.add('favourite_team_name', ins[i]);
+        }
+
+        this.connection.close();
+    }
+}
 
 /************************** app object *********************************************************/
 
 const app = {
 
     header : null,
+
+    favTeamNames : [],
 
     params : {
         setup : null,
@@ -224,7 +268,53 @@ const app = {
     teams : [],     // one team example: {name: "Jets 1", score: 10}
     fixtures : [],  // one fixture example: {r:3, c:1, team1Id: 0, team2Id: 3, result: 'x'} // possible results: '1', 'x', '2', '-' // teamNId : null in case of the placeholder team
 
-    tab : 'backend', // possible values: 'backend', 'frontend'
+    tab : 'backend', // possible values: 'backend', 'frontend'    
+
+    initializeFavouriteTeamNames : async function() {
+        this.favTeamNames = await idbHelper.getFavouriteTeamNames();
+    },
+
+    updateFavouriteTeamNames : async function(newNames) {
+
+        const ln = this.favTeamNames.length;
+        const lid = this.favTeamNames[ln - 1].id;
+
+        const ins = newNames.map(function(name, i){ return {id: (lid + i + 1), name}; });
+        const out = [];
+        const res = [];
+
+        let rem = 100 - newNames.length;
+
+        for(let i = ln - 1; i >= 0; i--) {
+            const currName = this.favTeamNames[i].name;
+            if (newNames.includes(currName)) {  
+                // we found a duplicate, we can delete the old one             
+                out.push(this.favTeamNames[i]);
+                // the new one must be really useful, bubble it till the end of the pile (so it will last longer)
+                for(let j = 0; j < ins.length - 1; j++) {
+                    if(ins[j].name.match(currName)) {
+                        ins[j].name = ins[j+1].name; 
+                        ins[j+1].name = currName;
+                    }
+                }
+            } else if (rem <= 0) {
+                // no more space among the 100 favourites
+                out.push(this.favTeamNames[i]);
+            } else {
+                // still having space, plus it's not a duplicate, let's keep it   
+                res.unshift(this.favTeamNames[i]);
+                rem--;
+            }
+        }
+
+        for(let i = 0; i < ins.length; i++) {
+            res.push(ins[i]);
+        }
+
+        await idbHelper.addOrRemoveFavouriteTeamNames(ins, out);
+
+        this.favTeamNames = res;
+    },
 
     syncWithStorage : function() {
 
@@ -460,6 +550,8 @@ function updateTeamsControls(){
 
     let inputs = {};
 
+    const suggestedNames = app.favTeamNames.map(function(fav){ return fav.name}).sort();
+
     for(let i = 1; i <= 10; i++){
 
         const span = document.createElement('span');
@@ -473,7 +565,7 @@ function updateTeamsControls(){
         inputs[`${i}`].setAttribute('aria-label', `team ${i} input`);
         inputs[`${i}`].setAttribute('id', `team${i}_INPUT`);        
         inputs[`${i}`].value = app.getTeamNameByCardinal(i);
-        autocomplete(inputs[`${i}`], CUSTOM_NAMES);
+        autocomplete(inputs[`${i}`], suggestedNames);
 
         const jButton = document.createElement('button');
         jButton.classList.add('btn', 'btn-primary');
@@ -781,7 +873,7 @@ function disableBack() {
 
 /*********************  page load ****************************************************/
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", async function() {
 
     const backendTab = new bootstrap.Tab(document.querySelector('#backendTab'));
     const frontendTab = new bootstrap.Tab(document.querySelector('#frontendTab'));    
@@ -863,18 +955,23 @@ document.addEventListener("DOMContentLoaded", function() {
         backBTN.disabled = false;
     });
 
-    calcBTN.addEventListener('click', function (event) {
+    calcBTN.addEventListener('click', async function (event) {
         backBTN.disabled = true;
         calcBTN.disabled = true;
-        app.update(fetchHeaderFromUI(), fetchParamsFromControls(), fetchTeamsFromControls());    
+        const fetchedTeams = fetchTeamsFromControls()
+        app.update(fetchHeaderFromUI(), fetchParamsFromControls(), fetchedTeams);   
+        await app.updateFavouriteTeamNames(fetchedTeams);       
         app.switchTabTo('frontend');   
-        frontendTab.show();       
+        frontendTab.show();   
         updateControls();
         updateViews();
-    });  
-
+    });
+    
     app.syncWithStorage();
     if(app.tab === 'backend') backendTab.show(); else frontendTab.show();
+    
+    await app.initializeFavouriteTeamNames();
+    
     updateHeader();
     updateControls();
     updateViews();
