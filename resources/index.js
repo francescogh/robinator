@@ -6,9 +6,14 @@ const DEFAULT_HEADER = '4v4 Mixed - Jets Monday Session';
 const DEFAULT_TEAM_NAME_PREFIX = 'Jets Crew';
 
 const DEFAULT_FAVOURITE_TEAM_NAMES = [
+    'Drummond Jets',
+    'ThunderJets Smashers',
+    'NinJets',
+    'OAP Jets', 
+    'Ready Jets Go',
     'Setters on the dance floor',
     'Rampage World Tour',
-    'Laser Jets'
+    'Laser Jets',
 ];
 
 const SET_OF = {
@@ -95,18 +100,33 @@ function getRandomNum(topVal){
     return (d + r) % topVal;
 }
 
+/**
+ * around 33% of random names are taken from either app.favTeamNames or DEFAULT_FAVOURITE_TEAM_NAMES 
+ */
 function getRandomName(){    
 
     let name = '';
 
-    const sets = NAME_TYPES[getRandomNum(NAME_TYPES.length)].split(' + ');
+    const nt = getRandomNum(1000);
+    nt % NAME_TYPES.length
+    
+    // 66% of times generate name from NAME_TYPES
+    if(nt <= 666) {
 
-    for(let s = 0; s < sets.length; s++) {
-        const set = SET_OF[`${sets[s]}`]; 
-        name += set[getRandomNum(set.length)] + ' ';
+        const sets = NAME_TYPES[nt % NAME_TYPES.length].split(' + ');
+
+        for(let s = 0; s < sets.length; s++) {
+            const set = SET_OF[`${sets[s]}`]; 
+            name += set[getRandomNum(set.length)] + ' ';
+        }
+    
+        return name.trim();
+
+    } else {
+        // 33% of times generate name from either app.favTeamNames or DEFAULT_FAVOURITE_TEAM_NAMES
+        const favNames = [...DEFAULT_FAVOURITE_TEAM_NAMES, ...app.favTeamNames.map(function(fav){ return fav.name})];
+        return favNames[nt % favNames.length];
     }
-
-    return name.trim();
 }
 
 function matchDefaultTeamNameTemplate(str) {            
@@ -639,7 +659,6 @@ function updateTeamsControls(){
                     taken.push(parseInt(inputVal.split(' ').pop()));
                 }
             }
-            console.log(taken);
             for(let j = 1; j <= 10; j++) {
                 if(!taken.includes(j)){
                      inputs[`${i}`].value = DEFAULT_TEAM_NAME_PREFIX + ` ${j}`; 
