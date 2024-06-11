@@ -1,9 +1,9 @@
 /********************* constants *************************************************/
-const VERSION = 1.4;
+const VERSION = 1.5;
 
 const DEFAULT_HEADER = '4v4 Mixed - Jets Monday Session';
 
-const DEFAULT_TEAM_NAME_PREFIX = 'Jets';
+const DEFAULT_TEAM_NAME_PREFIX = 'Jets Crew';
 
 const SET_OF = {
     COLORS : ['Black', 'Blue', 'Red', 'Pink', 'White', 'Green', 'Gray', 'Purple'],
@@ -622,7 +622,21 @@ function updateTeamsControls(){
         });
 
         jButton.addEventListener('click', function (event) { 
-            inputs[`${i}`].value = DEFAULT_TEAM_NAME_PREFIX + ` ${i}`; 
+            const taken = [];         
+            const regexp = new RegExp('^' + DEFAULT_TEAM_NAME_PREFIX + '\\s(\\d+)$', 'g');
+            for(let j = 1; j <= 10; j++) {                
+                const inputVal = document.querySelector(`#team${j}_INPUT`).value;
+                if(j !== i && inputVal.match(regexp)) {
+                    taken.push(parseInt(inputVal.split(' ').pop()));
+                }
+            }
+            console.log(taken);
+            for(let j = 1; j <= 10; j++) {
+                if(!taken.includes(j)){
+                     inputs[`${i}`].value = DEFAULT_TEAM_NAME_PREFIX + ` ${j}`; 
+                     break;
+                }
+            }            
         }); 
 
         rButton.addEventListener('click', function (event) { 
