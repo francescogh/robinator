@@ -5,6 +5,12 @@ const DEFAULT_HEADER = '4v4 Mixed - Jets Monday Session';
 
 const DEFAULT_TEAM_NAME_PREFIX = 'Jets Crew';
 
+const DEFAULT_FAVOURITE_TEAM_NAMES = [
+    'Setters on the dance floor',
+    'Rampage World Tour',
+    'Laser Jets'
+];
+
 const SET_OF = {
     COLORS : ['Black', 'Blue', 'Red', 'Pink', 'White', 'Green', 'Gray', 'Purple'],
     NAMES : ['Barbara', 'Hanna', 'Bill', 'Mary', 'Martha', 'Frank', 'Simon', 'Lucy', 'Etta', 'Eleanor', 'Nina', 'Tina', 'Daisy', 'Vicky'],   
@@ -75,7 +81,6 @@ const PARAMS_DEFAULTS = {
     LOSS_PTS : 0
 };
 
-
 /********************* general utils **********************************************************/
 
 let rSeed = 1;
@@ -102,6 +107,10 @@ function getRandomName(){
     }
 
     return name.trim();
+}
+
+function matchDefaultTeamNameTemplate(str) {            
+    return str.match(new RegExp('^' + DEFAULT_TEAM_NAME_PREFIX + '\\s(\\d+)$', 'g'));
 }
 
 function even(n) {
@@ -202,8 +211,8 @@ const idbHelper = {
 
                         // ..and put some initial values
                         transaction.addEventListener('complete', function(transComplEvent){
-                            for(let i = 1; i <= 10; i++) {                                
-                                db.add('favourite_team_name', {id: i, name: `${DEFAULT_TEAM_NAME_PREFIX} ${i}`});
+                            for(let i = 0; i < DEFAULT_FAVOURITE_TEAM_NAMES.length; i++) {                                
+                                db.add('favourite_team_name', {id: i + 1, name: DEFAULT_FAVOURITE_TEAM_NAMES[i]});
                             }
                         });
                         break;
@@ -279,7 +288,8 @@ const app = {
         const ln = this.favTeamNames.length;
         const lid = this.favTeamNames[ln - 1].id;
 
-        const ins = newNames.map(function(name, i){ return {id: (lid + i + 1), name}; });
+        const ins = newNames.filter(function(name){ return !matchDefaultTeamNameTemplate(name); })
+                            .map(function(name, i){ return {id: (lid + i + 1), name}; });
         const out = [];
         const res = [];
 
@@ -622,11 +632,10 @@ function updateTeamsControls(){
         });
 
         jButton.addEventListener('click', function (event) { 
-            const taken = [];         
-            const regexp = new RegExp('^' + DEFAULT_TEAM_NAME_PREFIX + '\\s(\\d+)$', 'g');
+            const taken = [];     
             for(let j = 1; j <= 10; j++) {                
                 const inputVal = document.querySelector(`#team${j}_INPUT`).value;
-                if(j !== i && inputVal.match(regexp)) {
+                if(j !== i && matchDefaultTeamNameTemplate(inputVal)) {
                     taken.push(parseInt(inputVal.split(' ').pop()));
                 }
             }
