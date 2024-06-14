@@ -39,6 +39,21 @@ h2, h3, legend, label {
     font-size: 14px;
 } 
 
+#fixtures .rId {
+    border: 1px solid #FFE5D0;
+    background-color: #FF7400;
+    color: #FFE5D0;
+    border-radius: 100%;
+    position: absolute;
+    z-index: 9;
+    top: -4px;
+    left: 0;
+    width: 2em;
+    height: 2em;
+    line-height: 2em;
+    font-weight: bold;
+}
+
 #fixtures .cNumber {
     text-align: center;
 } 

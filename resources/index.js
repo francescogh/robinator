@@ -708,8 +708,13 @@ function updateFixturesView(){
         tableWrap.classList.add('fxTableWrap');                       
 
         const wall1 = document.createElement('div');
-        wall1.classList.add('rInterval');
+        wall1.classList.add('rInterval', 'position-relative');
         wall1.innerHTML = app.getRoundInterval(r);
+
+        const rId = document.createElement('div');
+        rId.classList.add('rId');
+        rId.innerHTML = `R${r}`;
+        wall1.appendChild(rId);
 
         const table = document.createElement('div'); 
         table.classList.add('fxTable');
@@ -741,7 +746,7 @@ function updateFixturesView(){
             cNumber.innerHTML = c;
             wall2.appendChild(cNumber);
         }
-        
+                
         tableWrap.appendChild(wall1);   
         tableWrap.appendChild(table);
         tableWrap.appendChild(wall2);   
