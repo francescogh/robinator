@@ -53,13 +53,29 @@ h2, h3, legend, label {
     bottom: 0.5em;
 }
 
-#leaderboard{
+#leaderboard {
     background-color: #FF953D;
-    font-size: 1.2em;
 }
 
 #leaderboard .lb-even { background-color: #FFE5D0; }
 #leaderboard .lb-odd { background-color: #F8F9FA; }
+
+#leaderboard > div {
+    height: 2.4em;
+    display : flex;
+    align-items : center;
+}
+
+#leaderboard > div p {    
+    display: inline-block;
+    line-height: 1.2em;
+    margin: 0;
+}
+
+.lbOrd {
+    color: #FF953D;
+    font-weight: bold;
+}
 
 .fxTableWrap {    
     margin: 0 0 1em; 

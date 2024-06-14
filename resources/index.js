@@ -846,23 +846,41 @@ function updateTableView(){
 
     lbTeams.sort(function(a, b){ return b.score - a.score; });
 
-    for( let i = 0; i < lbTeams.length; i++){
-        
-        const p = document.createElement('p');
-        const bg = (i % 2 == 0) ? 'lb-even' : 'lb-odd';
-        p.classList.add('row', 'mb-2', bg);
+    let currScore = rounds_for(app.nTeams) * app.params.win_pts + 1;
+    let ordHTML = '';
+    let bgi = 1;
 
+    for( let i = 0; i < lbTeams.length; i++){
+
+        if(lbTeams[i].score < currScore) {
+            currScore = lbTeams[i].score;
+            ordHTML = `<p>${i+1}</p>`;
+            bgi++;
+        } else {
+            ordHTML = `<p>&nbsp;</p>`; 
+        }
+        
+        const tableRow = document.createElement('div');
+        const bg = (bgi % 2 == 0) ? 'lb-even' : 'lb-odd';
+        tableRow.classList.add('row', 'mb-2', bg);
+        if(i == 0) tableRow.classList.add('mt-3');
+
+        const ordCol = document.createElement('div');
+        ordCol.classList.add('col-1', 'col-md-2', 'lbOrd', 'ps-0', 'text-end');
+        ordCol.innerHTML = ordHTML;
+        
         const teamCol = document.createElement('div');
-        teamCol.classList.add('col-10');
-        teamCol.innerHTML = lbTeams[i].name;
+        teamCol.classList.add('col-9', 'col-md-8', 'ps-0');
+        teamCol.innerHTML = `<p>${lbTeams[i].name}</p>`;
 
         const scoreCol = document.createElement('div');
         scoreCol.classList.add('col-2', 'text-end');
-        scoreCol.innerHTML = lbTeams[i].score;
+        scoreCol.innerHTML = `<p>${lbTeams[i].score}</p>`;
         
-        p.appendChild(teamCol);
-        p.appendChild(scoreCol);
-        lb.appendChild(p);
+        tableRow.appendChild(ordCol);
+        tableRow.appendChild(teamCol);
+        tableRow.appendChild(scoreCol);
+        lb.appendChild(tableRow);
     }
 }
 
