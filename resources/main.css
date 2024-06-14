@@ -36,6 +36,7 @@ h2, h3, legend, label {
 #fixtures .rInterval {   
     background-color: #FF953D; 
     text-align: center;
+    font-size: 14px;
 } 
 
 #fixtures .cNumber {
