@@ -757,7 +757,7 @@ function createFixtureDiv(r, c, s){
     const teamBName = app.getTeamNameFromFixture(r, c, 3-s); 
 
     const fixtureDiv = document.createElement('div');   
-    fixtureDiv.classList.add('col', 'p-1', 'position-relative');
+    fixtureDiv.classList.add('col', 'fxCell', 'p-1', 'position-relative');
 
     let btnResultClass;
     if(result === '-') btnResultClass = 'btn-light';
@@ -767,7 +767,7 @@ function createFixtureDiv(r, c, s){
 
     resultButton = document.createElement('button');    
     resultButton.setAttribute('id', `result_${r}_${c}_${s}_BTN`);            
-    resultButton.classList.add('btn', btnResultClass, 'btn-sm', 'p-1');
+    resultButton.classList.add('btn', btnResultClass, 'btn-sm');
     resultButton.setAttribute('type', 'button'); 
 
     resultButton.innerHTML  = teamAName != null ? teamAName : '---';

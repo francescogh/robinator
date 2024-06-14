@@ -69,11 +69,17 @@ h2, h3, legend, label {
     border: 1px solid #B65300;
 }
 
+.fxCell {
+    overflow-x: hidden;
+}
+
 .fxTable .btn {
     width: 100%;
-    min-width: 100%;
-    min-height: 100%;
-    overflow-wrap: anywhere;
+    height: calc(3.6em + 4px);
+    overflow-y: clip;
+    text-overflow: ellipsis;
+    line-height: 1.2em;
+    padding: 2px;
 }
 
 .fxTable .btn.btn-success {
