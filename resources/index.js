@@ -1,9 +1,11 @@
 /********************* constants *************************************************/
-const VERSION = 1.5;
+const VERSION = 2.1;
+
+const MAX_TEAMS = 12
 
 const DEFAULT_HEADER = '4v4 Mixed - Jets Monday Session';
 
-const DEFAULT_TEAM_NAME_PREFIX = 'Jets Crew';
+const DEFAULT_TEAM_NAME_PREFIX = 'J-Team';
 
 const DEFAULT_FAVOURITE_TEAM_NAMES = [
     'Drummond Jets',
@@ -584,7 +586,7 @@ function updateTeamsControls(){
 
     const suggestedNames = app.favTeamNames.map(function(fav){ return fav.name}).sort();
 
-    for(let i = 1; i <= 10; i++){
+    for(let i = 1; i <= MAX_TEAMS; i++){
 
         const span = document.createElement('span');
         span.classList.add('input-group-text');
@@ -653,13 +655,13 @@ function updateTeamsControls(){
 
         jButton.addEventListener('click', function (event) { 
             const taken = [];     
-            for(let j = 1; j <= 10; j++) {                
+            for(let j = 1; j <= MAX_TEAMS; j++) {                
                 const inputVal = document.querySelector(`#team${j}_INPUT`).value;
                 if(j !== i && matchDefaultTeamNameTemplate(inputVal)) {
                     taken.push(parseInt(inputVal.split(' ').pop()));
                 }
             }
-            for(let j = 1; j <= 10; j++) {
+            for(let j = 1; j <= MAX_TEAMS; j++) {
                 if(!taken.includes(j)){
                      inputs[`${i}`].value = DEFAULT_TEAM_NAME_PREFIX + ` ${j}`; 
                      break;
@@ -881,7 +883,7 @@ function fetchTeamsFromControls(){
     const teamNames = [];
     
     // fetch team names from input controls
-    for(let i = 1; i <= 10; i++) {
+    for(let i = 1; i <= MAX_TEAMS; i++) {
         input = document.querySelector(`\#team${i}_INPUT`);
         if(input.value.trim() != '') {
             teamNames.push(input.value.trim());
@@ -906,7 +908,7 @@ function resetControls() {
     document.querySelector('#draw_pts').value = PARAMS_DEFAULTS.DRAW_PTS;
     document.querySelector('#loss_pts').value = PARAMS_DEFAULTS.LOSS_PTS;
 
-    for(let i = 1; i <= 10; i++) { 
+    for(let i = 1; i <= MAX_TEAMS; i++) { 
         document.querySelector(`\#team${i}_INPUT`).value = '';
     }
 }
@@ -967,7 +969,7 @@ document.addEventListener("DOMContentLoaded", async function() {
 
     diceBTN.addEventListener('click', function (event) {       
         
-        for(let i = 1; i <= 10; i++) {
+        for(let i = 1; i <= MAX_TEAMS; i++) {
             document.querySelector(`\#team${i}_INPUT`).value = getRandomName();
         }
     });
@@ -977,7 +979,7 @@ document.addEventListener("DOMContentLoaded", async function() {
         const inputs = [];
         const names = [];
         
-        for(let i = 1; i <= 10; i++) {
+        for(let i = 1; i <= MAX_TEAMS; i++) {
             input = document.querySelector(`\#team${i}_INPUT`);
             inputs.push(input);
             if(input.value.trim() != '') {
@@ -985,7 +987,7 @@ document.addEventListener("DOMContentLoaded", async function() {
             }
         }
 
-        for(let i = 0; i < 10; i++) {
+        for(let i = 0; i < MAX_TEAMS; i++) {
             inputs[i].value = i < names.length ? names[i] : '';
         }
 
