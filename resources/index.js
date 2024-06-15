@@ -487,6 +487,11 @@ const app = {
         });
     },
 
+    isAFixtureGap : function(r, c){       
+        const f = this.getFixtureByRC(r, c);
+        return (f.team1Id === null || f.team2Id === null);
+    },
+
     getFixtureResult : function(r, c) {
         const fixture = this.getFixtureByRC(r, c);
         return fixture.result;
@@ -712,6 +717,7 @@ function updateFixturesView(){
 
         const rId = document.createElement('div');
         rId.classList.add('rId');
+        rId.setAttribute('id', `R${r}`);
         rId.innerHTML = `R${r}`;
         roundHeader.appendChild(rId);
 
@@ -816,7 +822,9 @@ function createFixtureDiv(r, c, s){
             btA.classList.replace('btn-danger', 'btn-light');            
             btB.classList.replace('btn-success', 'btn-light');
         }
-        
+
+        checkRoundCompleted(r);
+
         updateTableView();
     });    
         
@@ -840,6 +848,18 @@ function shrinkBtn(event){
 function jiggleBtn(event){  
     event.target.classList.remove('shrink');
     event.target.classList.add('jiggle');
+}
+
+function checkRoundCompleted(r) {
+    const rId = document.querySelector(`#R${r}`);
+
+    let completed = true;
+    for(let c = 1; c <= courts_for(app.nTeams); c++) {
+        if(!app.isAFixtureGap(r, c) && app.getFixtureResult(r, c) === '-') completed = false;
+    }
+
+    if(completed) rId.classList.add('completed');
+    else rId.classList.remove('completed');
 }
 
 function updateTableView(){

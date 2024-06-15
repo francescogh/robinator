@@ -59,6 +59,11 @@ legend {
     font-weight: bold;
 }
 
+#fixtures .rId.completed {    
+    background-color: limegreen;
+    color: white;
+}
+
 #fixtures .btn:focus {
     border-color: #0D6EFD ;
     box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .5); 
