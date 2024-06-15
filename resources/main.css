@@ -1,5 +1,6 @@
 h2, h3, legend, label {    
     color: #FFF;
+    line-height: 1.2em;
 }
 
 #header {
@@ -31,6 +32,10 @@ h2, h3, legend, label {
     background-color: #FF7400; 
     border-bottom: 0.25em solid #FF7400;
     min-height: 96vh;    
+}
+
+legend {
+    font-size: 1.25em;
 }
 
 #fixtures .roundHeader {  
@@ -228,6 +233,10 @@ h2, h3, legend, label {
 }
 
 @media screen and (min-width: 768px) {
+
+    #frontendMain, #frontendAside {
+        margin-left: -4px;
+    }
 
     #fixtures {
         max-height: calc(100vh - 110px);
