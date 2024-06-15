@@ -54,19 +54,14 @@ h2, h3, legend, label {
     font-weight: bold;
 }
 
+#fixtures .btn:focus {
+    border-color: #0D6EFD ;
+    box-shadow: 0 0 0 .25rem rgba(13, 110, 253, .5); 
+}
+
 #fixtures .cNumber {
     text-align: center;
 } 
-
-#fixtures .thumb {
-    color: #B65300;
-    width: 1em;
-    line-height: 1em;
-    padding: 0;
-    margin: 0;
-    right: 0.5em;
-    bottom: 0.5em;
-}
 
 #leaderboard {
     background-color: #FF953D;
@@ -143,6 +138,33 @@ h2, h3, legend, label {
     background-color: transparent;
 }
 
+.shrink {
+    animation: shrink .3s forwards alternate; 
+}
+
+.jiggle {
+    animation: jiggle 1.5s forwards ease-in-out;
+}
+
+@keyframes shrink {
+    0% { }
+    100% { transform: scale(.9); } 
+}
+ 
+@keyframes jiggle {
+    0% { transform: scale(.9); }
+    10% { transform: scale(1.1); }
+    20% { transform: scale(.9); }
+    30% { transform: scale(1.05); }
+    40% { transform: scale(.95); }
+    50% { transform: scale(1.025); }
+    60% { transform: scale(.975); }
+    70% { transform: scale(1.02); }
+    80% { transform: scale(.985); }
+    90% { transform: scale(1.01); }
+    100% { transform: scale(1); }
+}
+
 .autocomplete {
     position: relative;
 }
@@ -212,11 +234,6 @@ h2, h3, legend, label {
         overflow-x: hidden;
         overflow-y: auto;
     } 
-
-    #fixtures .thumb {        
-        right: 0.25em;
-        bottom: calc(50% - 0.5em);
-    }
 
     #headerINPUT {
         max-width: 90%;

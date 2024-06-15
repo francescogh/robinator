@@ -773,7 +773,7 @@ function createFixtureDiv(r, c, s){
     const teamBName = app.getTeamNameFromFixture(r, c, 3-s); 
 
     const fixtureDiv = document.createElement('div');   
-    fixtureDiv.classList.add('col', 'fxCell', 'p-1', 'position-relative');
+    fixtureDiv.classList.add('col', 'fxCell', 'p-1');
 
     let btnResultClass;
     if(result === '-') btnResultClass = 'btn-light';
@@ -797,10 +797,6 @@ function createFixtureDiv(r, c, s){
         const btA = event.target;
         const btB = document.querySelector(`#result_${r}_${c}_${(3-s)}_BTN`);  
 
-        // remove the old thumb
-        let oldThumb = document.querySelector('#thumb');
-        if(oldThumb) oldThumb.remove();
-
         if(btA.classList.contains('btn-light')) {            
             app.setResult(r, c, `${s}`);            
             btA.classList.replace('btn-light', 'btn-success');
@@ -820,37 +816,31 @@ function createFixtureDiv(r, c, s){
             app.setResult(r, c, '-');            
             btA.classList.replace('btn-danger', 'btn-light');            
             btB.classList.replace('btn-success', 'btn-light');
-        }        
-
-        // create and append the new thumb
-        appendNewThumbFor(fixtureDiv);
+        }
         
         updateTableView();
-    });
+    });    
+        
+    addJiggleBtnAnim(resultButton);
 
     fixtureDiv.appendChild(resultButton);
 
     return fixtureDiv;
 }
 
-function appendNewThumbFor(blockEle){
-    const newThumb = document.createElement('div');  
-    newThumb.setAttribute('id', 'thumb');   
-    newThumb.classList.add('thumb', 'position-absolute');
-    newThumb.setAttribute('style', `font-size: 1.2em; transform: rotate(0deg); opacity: 0.50;`);
-    newThumb.innerHTML = `<i class="bi bi-hand-thumbs-up"></i>`;
-    blockEle.appendChild(newThumb);
+function addJiggleBtnAnim(btn) {
+    btn.addEventListener('mousedown', shrinkBtn);
+    btn.addEventListener('mouseup', jiggleBtn);
+}
 
-    // animate the thumb
-    const steps = [
-        {siz: 1.4, opa: 0.55}, {siz: 1.6, opa: 0.60}, {siz: 1.8, opa: 0.65}, {siz: 2.0, opa: 0.70}, {siz: 2.0, opa: 0.75},
-        {siz: 2.0, opa: 0.80}, {siz: 1.8, opa: 0.85}, {siz: 1.6, opa: 0.90}, {siz: 1.4, opa: 0.95}, {siz: 1.2, opa: 1.00}
-    ];
-    for(let i = 0; i < steps.length; i++){
-        setTimeout(() => {                
-            newThumb.setAttribute('style', `font-size: ${steps[i].siz}em; transform: rotate(0deg); opacity: ${steps[i].opa};`);
-        }, i * 50);
-    }
+function shrinkBtn(event){
+    event.target.classList.remove('jiggle');
+    event.target.classList.add('shrink');
+}
+
+function jiggleBtn(event){  
+    event.target.classList.remove('shrink');
+    event.target.classList.add('jiggle');
 }
 
 function updateTableView(){
@@ -864,7 +854,7 @@ function updateTableView(){
 
     let currScore = rounds_for(app.nTeams) * app.params.win_pts + 1;
     let ordHTML = '';
-    let bgi = 1;
+    let bgi = 0;
 
     for( let i = 0; i < lbTeams.length; i++){
 
