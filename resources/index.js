@@ -705,51 +705,62 @@ function updateFixturesView(){
     for (let r = 1; r <= nRounds; r++) {
 
         const tableWrap = document.createElement('div'); 
-        tableWrap.classList.add('fxTableWrap');                       
+        tableWrap.classList.add('row', 'fxTableWrap');                       
 
-        const wall1 = document.createElement('div');
-        wall1.classList.add('rInterval', 'position-relative');
-        wall1.innerHTML = app.getRoundInterval(r);
+        const roundHeader = document.createElement('div');
+        roundHeader.classList.add('roundHeader', 'position-relative');
+        roundHeader.innerHTML = app.getRoundInterval(r);
 
         const rId = document.createElement('div');
         rId.classList.add('rId');
         rId.innerHTML = `R${r}`;
-        wall1.appendChild(rId);
+        roundHeader.appendChild(rId);
 
-        const table = document.createElement('div'); 
-        table.classList.add('fxTable');
+        const roundTable = document.createElement('div'); 
+        roundTable.classList.add('col-12', 'fxTable');
+
+        // Calculate table min-width and padding (trying to create  perfect matches for: Google Pixel 5 with 4 courts, Galaxy Tab A9.7 with 5 courts).
+        const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+        const minWInc = vw < 412 ? 4 : 0;
+        const minW = nCourts > 4 ? nCourts * (83 + minWInc) : 300;
+        const padding = nCourts > 4 ? 5 : 0;
+
+        const tableScrollable = document.createElement('div');
+        tableScrollable.setAttribute('style', `min-width: ${minW}px; padding-bottom: ${padding}px;`);
 
         const side1 = document.createElement('div');
-        side1.classList.add('row', 'gx-1', 'gx-md-2');        
+        side1.classList.add('side1', 'row');        
 
         const net = document.createElement('div');
         net.classList.add('row');
         net.innerHTML = `<div class="col"><hr class="my-0"></div>`;
 
         const side2 = document.createElement('div');
-        side2.classList.add('row', 'gx-1', 'gx-md-2');   
+        side2.classList.add('side2', 'row');   
         
         for(let c = 1; c <= nCourts; c++) {
             side1.appendChild(createFixtureDiv(r, c, 1)); 
             side2.appendChild(createFixtureDiv(r, c, 2)); 
-        }
+        }              
 
-        table.appendChild(side1);
-        table.appendChild(net);
-        table.appendChild(side2);                 
-
-        const wall2 = document.createElement('div');
-        wall2.classList.add('row', 'gx-1', 'gx-md-2');
+        const roundTableFooter = document.createElement('div');
+        roundTableFooter.classList.add('row');
         for(let c = 1; c <= nCourts; c++) { 
             const cNumber = document.createElement('div');
             cNumber.classList.add('col', 'cNumber');
             cNumber.innerHTML = c;
-            wall2.appendChild(cNumber);
+            roundTableFooter.appendChild(cNumber);
         }
-                
-        tableWrap.appendChild(wall1);   
-        tableWrap.appendChild(table);
-        tableWrap.appendChild(wall2);   
+
+        tableScrollable.appendChild(side1);
+        tableScrollable.appendChild(net);
+        tableScrollable.appendChild(side2);   
+        tableScrollable.appendChild(roundTableFooter);   
+
+        roundTable.appendChild(tableScrollable);
+
+        tableWrap.appendChild(roundHeader);      
+        tableWrap.appendChild(roundTable);
 
         fixtures.appendChild(tableWrap);
     }

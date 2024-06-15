@@ -33,7 +33,7 @@ h2, h3, legend, label {
     min-height: 96vh;    
 }
 
-#fixtures .rInterval {   
+#fixtures .roundHeader {  
     background-color: #FF953D; 
     text-align: center;
     font-size: 14px;
@@ -98,7 +98,17 @@ h2, h3, legend, label {
 }
 
 .fxTable {
-    border: 1px solid #B65300;
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.fxTable .side1 {
+    border-top: 1px solid #B65300;
+}
+
+.fxTable .side2 {
+    border-bottom: 1px solid #B65300;
 }
 
 .fxCell {
@@ -161,6 +171,38 @@ h2, h3, legend, label {
 .autocomplete-active {
   background-color: #0D6EFD !important;
   color: #FFF;
+}
+
+@media screen and (min-width: 576px) {
+
+    @supports (scrollbar-color: auto) {
+
+        .fxTable {
+            scrollbar-width: thin;
+            scrollbar-color: #FF7400 #EEE;
+        }
+    
+        #fixtures {
+            scrollbar-color: #FF7400 #EEE;
+        }
+
+    }
+
+    @supports selector(::-webkit-scrollbar) {
+    
+        .fxTable::-webkit-scrollbar { height: 10px; width: 15px; }
+        .fxTable::-webkit-scrollbar-track { background: #EEE; }
+        .fxTable::-webkit-scrollbar-button { background: #FF7400; }
+        .fxTable::-webkit-scrollbar-thumb { background: #FF7400; }
+        .fxTable::-webkit-scrollbar-thumb:hover { background: #B65300; }
+
+        #fixtures::-webkit-scrollbar { height: 10px; width: 15px; }
+        #fixtures::-webkit-scrollbar-track { background: #EEE; }
+        #fixtures::-webkit-scrollbar-button { background: #FF7400; }
+        #fixtures::-webkit-scrollbar-thumb { background: #FF7400; }
+        #fixtures::-webkit-scrollbar-thumb:hover { background: #B65300; }
+    }
+
 }
 
 @media screen and (min-width: 768px) {
