@@ -768,6 +768,8 @@ function updateFixturesView(){
         tableWrap.appendChild(roundTable);
 
         fixtures.appendChild(tableWrap);
+        
+        checkRoundCompleted(r);
     }
 }
 
