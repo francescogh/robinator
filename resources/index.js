@@ -110,7 +110,6 @@ function getRandomName(){
     let name = '';
 
     const nt = getRandomNum(1000);
-    nt % NAME_TYPES.length
     
     // 66% of times generate name from NAME_TYPES
     if(nt <= 666) {
