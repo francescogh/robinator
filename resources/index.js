@@ -78,6 +78,10 @@ const NAME_TYPES = [
     'COLORS + SUBSTANTIVES_SN + IN + COMPLIMENTS_FOR_IN'
 ];
 
+const PARAM_SETUP_VALUES = [0, 2, 5, 10, 15, 20, 25, 30];
+const PARAM_TAKEDOWN_VALUES = [0, 2, 5, 10, 15, 20, 25, 30];
+const PARAM_BREAKS_VALUES = [0, 1, 2, 3, 5, 10, 15, 30];
+
 const PARAMS_DEFAULTS = {
     SETUP : 15,
     TAKEDOWN : 15,
@@ -572,13 +576,25 @@ function updateControls() {
 }
 
 function updateParamsControls() {
-    document.querySelector('#setup').value = app.params.setup.toString();
-    document.querySelector('#takedown').value = app.params.takedown.toString();
-    document.querySelector('#breaks').value = app.params.breaks.toString();
+
+    updateSelect(document.querySelector('#setup'), PARAM_SETUP_VALUES, `'`, app.params.setup);
+    updateSelect(document.querySelector('#takedown'), PARAM_TAKEDOWN_VALUES, `'`, app.params.takedown);
+    updateSelect(document.querySelector('#breaks'), PARAM_BREAKS_VALUES, `'`, app.params.breaks);
     document.querySelector('#end').value = app.params.end;
     document.querySelector('#win_pts').value = app.params.win_pts.toString();
     document.querySelector('#draw_pts').value = app.params.draw_pts.toString();
     document.querySelector('#loss_pts').value = app.params.loss_pts.toString();
+}
+
+function updateSelect(select, values, unit, selectedValue) {
+    select.innerHTML = '';
+    for(let i = 0; i < values.length; i++) {
+        const option = document.createElement('option');
+        option.setAttribute('value', `${values[i]}`);
+        option.innerHTML = `${values[i]}${unit}`;
+        select.appendChild(option);
+    }
+    select.value = selectedValue.toString();
 }
 
 function updateTeamsControls(){
