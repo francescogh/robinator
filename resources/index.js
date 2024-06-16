@@ -1,5 +1,5 @@
 /********************* constants *************************************************/
-const VERSION = 2.1;
+const VERSION = 2.2;
 
 const MAX_TEAMS = 12
 
@@ -20,8 +20,8 @@ const DEFAULT_FAVOURITE_TEAM_NAMES = [
 
 const SET_OF = {
     COLORS : ['Black', 'Blue', 'Red', 'Pink', 'White', 'Green', 'Gray', 'Purple'],
-    NAMES : ['Barbara', 'Hanna', 'Bill', 'Mary', 'Martha', 'Frank', 'Simon', 'Lucy', 'Etta', 'Eleanor', 'Nina', 'Tina', 'Daisy', 'Vicky'],   
-    GENITIVES : ['Barbara\'s', 'France\'s', 'Jeremiah\'s', 'Mary\'s', 'Buddy\'s', 'Dwight\'s', 'Sophia\'s', 'Adam\'s', 'Mars'],  
+    NAMES : ['Barbara', 'Hanna', 'Bill', 'Mary', 'Martha', 'Jim', 'Frank', 'Luis', 'Simon', 'Lucy', 'Etta', 'Eleanor', 'Nina', 'Tina', 'Daisy', 'Vicky'],   
+    GENITIVES : ['Barbara\'s', 'France\'s', 'Jeremiah\'s', 'Grammy\'s', 'Grampa\'s', 'Mary\'s', 'Buddy\'s', 'Dwight\'s', 'Sophia\'s', 'Adam\'s', 'Mars'],  
     INTERIECTIONS_BF : ['Oh', 'Forza', 'Ready'],   
     INTERIECTIONS_AF : ['Yay', 'Woppa', 'Go'], 
     CLUBS : ['JETS', 'METS', 'NUVOC', 'QMU'],
@@ -89,7 +89,9 @@ const PARAMS_DEFAULTS = {
     END : '21:00',
     WIN_PTS : 2,
     DRAW_PTS : 1,
-    LOSS_PTS : 0
+    LOSS_PTS : 0,
+    PIVOT : 'BO-RI',
+    HOME_AWAY : 'REG'
 };
 
 /********************* general utils **********************************************************/
@@ -151,16 +153,22 @@ function courts_for(nt) {
 }
 
 /**
- * get an array of 0-based indexes where if nTeams is odd eventually an extra index is added in the second position 
- * because we want to leave the pivot team in court 1 side 1, and match the fake team with the pivot team in the last round
+ * get an array of 0-based indexes where if nTeams is odd eventually an extra index is added in the position 
+ * that allows the fake team to match with the pivot team in the last round
  */
-function getEvenArrayOfIndexes(nTeams){
+function getEvenArrayOfIndexes(nTeams, pivot){
 
     const res = [...Array(nTeams).keys()];
 
     if(nTeams % 2 != 0) {
-        // add the next index (nTeams) in second position (1)
-        res.splice(1, 0, nTeams);
+
+        if(pivot === 'TO-LE' || pivot === 'BO-RI') {
+            // add the next index (nTeams) in second position (1)
+            res.splice(1, 0, nTeams);
+        } else {            
+            // add the next index (nTeams) in second position (1)
+            res.splice(2, 0, nTeams);            
+        }
     }
 
     return res;
@@ -176,13 +184,35 @@ function rr(indexes, round){
 }
 
 /**
- * get the 0-based index of the team at (round, court, side)
+ * get the 0-based index of the team at (round, court, side) with given pivot (pi) and home away (ha) mode
  */
-function getTeamIndexFor(nTeams, round, court, side) {
+function getTeamIndexFor(nTeams, round, court, side, pivot, hamode) {
     
-    const indexes = getEvenArrayOfIndexes(nTeams); 
+    const indexes = getEvenArrayOfIndexes(nTeams, pivot); 
 
     rr(indexes, round);
+
+    let regSide; // "regular" rotation side from which to pick the team index from
+    if(hamode === 'REG')    regSide = side;
+    else                    regSide = (round % 2 == 1) ? side : 3 - side;
+
+    switch(pivot) {
+        case 'BO-RI':
+            if(regSide == 1)    return indexes[courts_for(nTeams) + court - 1];
+            else                return indexes[courts_for(nTeams) - court];
+
+        case 'BO-LE':
+            if(regSide == 1)    return indexes[court];
+            else                return indexes[(even(nTeams)-(court-1)) % even(nTeams)];
+
+        case 'TO-LE':
+            if(regSide == 1)    return indexes[court - 1];
+            else                return indexes[even(nTeams) - court];
+
+        case 'TO-RI':
+            if(regSide == 1)    return indexes[(courts_for(nTeams)+court) % even(nTeams)];
+            else                return indexes[courts_for(nTeams) - court + 1];
+    }
 
     if(side == 1) return indexes[court - 1];
     else return indexes[indexes.length - court];
@@ -295,7 +325,9 @@ const app = {
         end : null,
         win_pts : null,
         draw_pts : null,
-        loss_pts :null
+        loss_pts : null,
+        pivot : null,
+        home_away : null
     }, 
 
     nTeams : 0, 
@@ -368,6 +400,8 @@ const app = {
         this.params.win_pts = localStorage_getItem_or_int('win_pts', PARAMS_DEFAULTS.WIN_PTS);
         this.params.draw_pts = localStorage_getItem_or_int('draw_pts', PARAMS_DEFAULTS.DRAW_PTS);
         this.params.loss_pts = localStorage_getItem_or_int('loss_pts', PARAMS_DEFAULTS.LOSS_PTS);
+        this.params.pivot = localStorage_getItem_or_string('pivot', PARAMS_DEFAULTS.PIVOT);
+        this.params.home_away = localStorage_getItem_or_string('home_away', PARAMS_DEFAULTS.HOME_AWAY);
 
         // if no params in the storage, then initialize them from this object
         if(!localStorage.getItem('setup'))
@@ -417,6 +451,8 @@ const app = {
         this.params.win_pts = paramValues.win_pts;
         this.params.draw_pts = paramValues.draw_pts;
         this.params.loss_pts = paramValues.loss_pts;
+        this.params.pivot = paramValues.pivot;
+        this.params.home_away = paramValues.home_away;
         this.setStorageParamsFromThis();
 
         // update nTeams.........................
@@ -441,8 +477,8 @@ const app = {
 
         for(let i = 1; i <= rounds_for(this.nTeams); i++) {
             for(let j = 1; j <= courts_for(this.nTeams); j++) {
-                const team1Id = getTeamIndexFor(this.nTeams, i, j, 1);
-                const team2Id = getTeamIndexFor(this.nTeams, i, j, 2);
+                const team1Id = getTeamIndexFor(this.nTeams, i, j, 1, app.params.pivot, app.params.home_away);
+                const team2Id = getTeamIndexFor(this.nTeams, i, j, 2, app.params.pivot, app.params.home_away);
                 const t1Id = (team1Id == this.nTeams) ? null : team1Id;                
                 const t2Id = (team2Id == this.nTeams) ? null : team2Id;
                 this.fixtures.push({r: i, c: j, team1Id: t1Id, team2Id: t2Id, result: '-'});
@@ -546,6 +582,8 @@ const app = {
         localStorage_setString('win_pts', this.params.win_pts);
         localStorage_setString('draw_pts', this.params.draw_pts);
         localStorage_setString('loss_pts', this.params.loss_pts);
+        localStorage.setItem('pivot', this.params.pivot);
+        localStorage.setItem('home_away', this.params.home_away);
     },
 
     setStorageTeamsFromThis : function() {
@@ -583,7 +621,9 @@ function updateParamsControls() {
     document.querySelector('#end').value = app.params.end;
     document.querySelector('#win_pts').value = app.params.win_pts.toString();
     document.querySelector('#draw_pts').value = app.params.draw_pts.toString();
-    document.querySelector('#loss_pts').value = app.params.loss_pts.toString();
+    document.querySelector('#loss_pts').value = app.params.loss_pts.toString();    
+    document.querySelector('#pivot').value = app.params.pivot;  
+    document.querySelector('#home_away').value = app.params.home_away;
 }
 
 function updateSelect(select, values, unit, selectedValue) {
@@ -935,7 +975,9 @@ function fetchParamsFromControls(){
         end: document.querySelector('#end').value,
         win_pts: parseInt(document.querySelector('#win_pts').value),
         draw_pts: parseInt(document.querySelector('#draw_pts').value),
-        loss_pts: parseInt(document.querySelector('#loss_pts').value)
+        loss_pts: parseInt(document.querySelector('#loss_pts').value),        
+        pivot: document.querySelector('#pivot').value,        
+        home_away: document.querySelector('#home_away').value
     };
 }
 
@@ -964,10 +1006,11 @@ function resetControls() {
     document.querySelector('#takedown').value = PARAMS_DEFAULTS.TAKEDOWN;
     document.querySelector('#breaks').value = PARAMS_DEFAULTS.BREAKS;
     document.querySelector('#end').value = PARAMS_DEFAULTS.END; 
-
     document.querySelector('#win_pts').value = PARAMS_DEFAULTS.WIN_PTS;
     document.querySelector('#draw_pts').value = PARAMS_DEFAULTS.DRAW_PTS;
     document.querySelector('#loss_pts').value = PARAMS_DEFAULTS.LOSS_PTS;
+    document.querySelector('#pivot').value = PARAMS_DEFAULTS.PIVOT; 
+    document.querySelector('#home_away').value = PARAMS_DEFAULTS.HOME_AWAY; 
 
     for(let i = 1; i <= MAX_TEAMS; i++) { 
         document.querySelector(`\#team${i}_INPUT`).value = '';
