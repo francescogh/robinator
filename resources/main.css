@@ -1,6 +1,5 @@
 h2, h3, legend, label {    
     color: #FFF;
-    line-height: 1.2em;
 }
 
 #header {
@@ -34,9 +33,9 @@ h2, h3, legend, label {
     min-height: 96vh;    
 }
 
-legend {
-    font-size: 1.25em;
-}
+legend { font-size: 1.1em; }
+
+label { font-size: 0.875em; }
 
 #fixtures .roundHeader {  
     background-color: #FF953D; 
@@ -206,6 +205,8 @@ legend {
 }
 
 @media screen and (min-width: 576px) {
+
+    legend { font-size: 1.25em; }
 
     @supports (scrollbar-color: auto) {
 

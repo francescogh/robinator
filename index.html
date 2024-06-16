@@ -51,151 +51,185 @@
                 </header>
 
                 <div id="main" class="row">
-
-                    <ul class="nav nav-tabs d-none" id="app-tabs" role="tablist">
-                        <li class="nav-item" role="presentation"><button class="nav-link active" id="backendTab" data-bs-toggle="tab" data-bs-target="#backendPane" type="button" role="tab" aria-controls="backend" aria-selected="true">Backend</button></li>
-                        <li class="nav-item" role="presentation"><button class="nav-link" id="frontendTab" data-bs-toggle="tab" data-bs-target="#frontendPane" type="button" role="tab" aria-controls="frontend" aria-selected="true">Frontend</button></li>
-                    </ul>
                     
-                    <div class="tab-content" id="app-panes">
-            
-                        <!-- administration tab -->
-                        <div class="tab-pane fade show active" id="backendPane" role="tabpanel" aria-labelledby="backend-pane">
-            
-                            <h2 class="my-2 text-center">Administration</h2>
-            
-                            <form id="t-params" autocomplete="off">
-            
-                                <fieldset style="border-bottom: 1px solid #CCC;" class="row mb-1">                        
-            
-                                    <legend class="mb-2">Timing</legend>
-            
-                                    <div class="col-12 col-sm-6 mb-2 mb-sm-4">
-                                        <div class="row">                                
-                                            <label for="setup" class="col-4 col-sm-5 col-md-4 col-form-label form-control-sm">Set up</label>
-                                            <div class="col-4 col-sm-5 col-md-4 col-lg-3"><div class="input-group input-group-sm">
-                                                <input type="text" class="form-control" aria-label="Set up time" id="setup">
-                                                <span class="input-group-text">&#39;</span>
-                                            </div></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-12 col-sm-6 mb-2 mb-sm-4">
-                                        <div class="row"> 
-                                            <label for="takedown" class="col-4 col-sm-5 col-md-4 col-form-label form-control-sm">Take down</label>                                            
-                                            <div class="col-4 col-sm-5 col-md-4 col-lg-3"><div class="input-group input-group-sm">
-                                                <input type="text" class="form-control" aria-label="Take down time" id="takedown">
-                                                <span class="input-group-text">&#39;</span>
-                                            </div></div>
-                                        </div>
-                                    </div>
-            
-                                    <div class="col-12 col-sm-6 mb-2">
-                                        <div class="row">                                
-                                            <label for="breaks" class="col-4 col-sm-5 col-md-4 col-form-label form-control-sm">Breaks</label>
-                                            <div class="col-4 col-sm-5 col-md-4 col-lg-3"><div class="input-group input-group-sm">
-                                                <input type="text" class="form-control" aria-label="Break duration" id="breaks">
-                                                <span class="input-group-text">&#39;</span>
-                                            </div></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-12 col-sm-6 mb-2">
-                                        <div class="row"> 
-                                            <label for="end" class="col-4 col-sm-5 col-md-4 col-form-label form-control-sm">Session end</label>                                            
-                                            <div class="col-5 col-sm-6 col-md-5 col-lg-4">
-                                                <input type="time" class="form-control form-control-sm" aria-label="Session end time" id="end">
+                    <div class="col-12">
+
+                        <ul class="nav nav-tabs d-none" id="app-tabs" role="tablist">
+                            <li class="nav-item" role="presentation"><button class="nav-link active" id="backendTab" data-bs-toggle="tab" data-bs-target="#backendPane" type="button" role="tab" aria-controls="backend" aria-selected="true">Backend</button></li>
+                            <li class="nav-item" role="presentation"><button class="nav-link" id="frontendTab" data-bs-toggle="tab" data-bs-target="#frontendPane" type="button" role="tab" aria-controls="frontend" aria-selected="true">Frontend</button></li>
+                        </ul>
+                        
+                        <div class="tab-content" id="app-panes">
+                
+                            <!-- administration tab -->
+                            <div class="tab-pane fade show active" id="backendPane" role="tabpanel" aria-labelledby="backend-pane">
+                
+                                <h2 class="my-2 text-center">Administration</h2>
+                
+                                <form class="row" id="t-params" autocomplete="off">
+                
+                                    <fieldset class="col-12 mb-4">
+                                        
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <legend class="mb-0">Timing</legend>
                                             </div>
                                         </div>
-                                    </div>
-            
-                                </fieldset>
-            
-                                <fieldset style="border-bottom: 1px solid #CCC;" class="row mb-1">
-            
-                                    <legend class="mb-2">Scoring</legend>    
-            
-                                    <div class="col-4 mb-2"><div class="row">
-                                        <div class="col-5 col-md-4 col-lg-3"><label for="win_pts" class="col-form-label form-control-sm">Win</label></div>
-                                        <div class="col-6 col-sm-5 col-lg-4"><input type="text" class="form-control form-control-sm" aria-label="Win points" id="win_pts"></div>
-                                    </div></div>   
-            
-                                    <div class="col-4 mb-2"><div class="row">
-                                        <div class="col-5 col-md-4 col-lg-3"><label for="draw_pts" class="col-form-label form-control-sm">Draw</label></div>
-                                        <div class="col-6 col-sm-5 col-lg-4"><input type="text" class="form-control form-control-sm" aria-label="Draw points" id="draw_pts"></div>
-                                    </div></div>   
-            
-                                    <div class="col-4 mb-2"><div class="row">
-                                        <div class="col-5 col-md-4 col-lg-3"><label for="loss_pts" class="col-form-label form-control-sm">Loss</label></div>
-                                        <div class="col-6 col-sm-5 col-lg-4"><input type="text" class="form-control form-control-sm" aria-label="Loss points" id="loss_pts"></div>
-                                    </div></div> 
-            
-                                </fieldset>                    
-            
-                                <fieldset style="border-bottom: 1px solid #CCC;" class="row mb-1">
-            
-                                    <legend class="mb-2">Teams</legend>
-            
-                                    <div class="col mb-2" id="teamsFormControls"></div>
-            
-                                </fieldset>
-            
-                                <div class="mt-2 mb-5 text-center">
-            
-                                    <button id="resetBTN" type="button" class="btn btn-danger">Reset</button>
-            
-                                    <button id="diceBTN" type="button" class="btn btn-primary">RN</button>
-            
-                                    <button id="collapseBTN" type="button" class="btn btn-primary d-none d-sm-inline"><i class="bi bi-arrows-collapse"></i></button>
-            
-                                    <div class="btn-group" role="group" aria-label="calculate button group">
-                                        <button id="lockCalcBTN" type="button" class="btn btn-primary"><i class="bi bi-unlock"></i></button>
-                                        <button id="calcBTN" type="button" class="btn btn-primary" disabled>Calculate</button>
-                                    </div>
-                                    
-                                    <button id="nextBTN" type="button" class="btn btn-primary"><i class="bi bi-table"></i></button>
-            
-                                </div>                
-            
-                            </form>
-            
-                        </div>
-            
-                        <!-- fixtures and table tab  -->
-                        <div class="tab-pane fade" id="frontendPane" role="tabpanel" aria-labelledby="frontend-pane">
-            
-                            <div class="row">
-            
-                                <div id="frontendMain" class="col-12 col-md-8">
-            
-                                    <h2 class="text-center">Fixtures</h2>
-            
-                                    <div id="fixtures"></div>
-            
-                                </div>
-            
-                                <div id="frontendAside" class="col-12 col-md-4">
-            
-                                    <h2 class="text-center">Table</h2>
-            
-                                    <div class="row mb-4">
-                                        <div id="leaderboard" class="col-12"></div>
-                                    </div>
-            
-                                    <div class="text-center mb-3">
-                                        <div class="btn-group" role="group" aria-label="back button group">
-                                            <button id="lockBackBTN" type="button" class="btn btn-primary"><i class="bi bi-unlock"></i></button>
-                                            <button id="backBTN" type="button" class="btn btn-primary" disabled><i class="bi bi-arrow-left"></i></button>
+
+                                        <div class="row">
+                                            <label for="setup" class="col-3">Set up</label>
+                                            <label for="takedown" class="col-3">Takedown</label> 
+                                            <label for="breaks" class="col-2 col-sm-3">Breaks</label>                                            
+                                            <label for="end" class="col-4 col-sm-3">End</label>
                                         </div>
-                                    </div>
-            
-                                </div>
-            
+
+                                        <div class="row">
+                                            <div class="col-3 col-md-2 pe-0"> 
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text" class="form-control" aria-label="Set up time" id="setup">
+                                                    <span class="input-group-text">&#39;</span>
+                                                </div>
+                                            </div>                                            
+                                            <div class="col-3 col-md-2 offset-md-1 pe-0">                                    
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text" class="form-control" aria-label="Take down time" id="takedown">
+                                                    <span class="input-group-text">&#39;</span>
+                                                </div>
+                                            </div>                    
+                                            <div class="col-2 col-sm-3 col-md-2 offset-md-1 pe-0">   
+                                                <div class="input-group input-group-sm">
+                                                    <input type="text" class="form-control" aria-label="Break duration" id="breaks">
+                                                    <span class="input-group-text">&#39;</span>
+                                                </div>
+                                            </div>                                            
+                                            <div class="col-4 col-sm-3 col-lg-2 offset-md-1">                                            
+                                                <div class="input-group input-group-sm">
+                                                    <input type="time" class="form-control form-control-sm" aria-label="Session end time" id="end">
+                                                </div>
+                                            </div>
+                                        </div>                                          
+                
+                                    </fieldset>
+                
+                                    <fieldset class="col-6 mb-4">
+                                        
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <legend class="mb-0">Scoring</legend>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <label for="win_pts" class="col-4">Win</label>
+                                            <label for="draw_pts" class="col-4">Draw</label>
+                                            <label for="los_pts" class="col-4">Loss</label>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-4 col-lg-3 pe-1"> 
+                                                <input type="text" class="form-control form-control-sm" aria-label="Win points" id="win_pts">
+                                            </div> 
+                                            <div class="col-4 col-lg-3 offset-lg-1 pe-1"> 
+                                                <input type="text" class="form-control form-control-sm" aria-label="Win points" id="draw_pts">
+                                            </div> 
+                                            <div class="col-4 col-lg-3 offset-lg-1 pe-1"> 
+                                                <input type="text" class="form-control form-control-sm" aria-label="Win points" id="loss_pts">
+                                            </div> 
+                                        </div>                                          
+                
+                                    </fieldset>
+                
+                                    <fieldset class="col-6 mb-4">
+                                        
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <legend class="mb-0">Rotation</legend>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <label for="pivot" class="col-6">Pivot</label>
+                                            <label for="home_away" class="col-6">Home/Away</label>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-6 col-lg-5 pe-1"> 
+                                                <input type="text" class="form-control form-control-sm" aria-label="Win points" id="pivot">
+                                            </div> 
+                                            <div class="col-6 col-lg-5 offset-lg-1 pe-1"> 
+                                                <input type="text" class="form-control form-control-sm" aria-label="Win points" id="home_away">
+                                            </div> 
+                                        </div>                                          
+                
+                                    </fieldset>         
+                
+                                    <fieldset class="col-12 mb-4">
+                
+                                        <legend class="mb-2">Teams</legend>
+                
+                                        <div class="col mb-2" id="teamsFormControls"></div>
+                
+                                    </fieldset>
+                
+                                    <div class="col-12 mt-2 mb-5 text-center">
+                
+                                        <button id="resetBTN" type="button" class="btn btn-danger">Reset</button>
+                
+                                        <button id="diceBTN" type="button" class="btn btn-primary">RN</button>
+                
+                                        <button id="collapseBTN" type="button" class="btn btn-primary d-none d-sm-inline"><i class="bi bi-arrows-collapse"></i></button>
+                
+                                        <div class="btn-group" role="group" aria-label="calculate button group">
+                                            <button id="lockCalcBTN" type="button" class="btn btn-primary"><i class="bi bi-unlock"></i></button>
+                                            <button id="calcBTN" type="button" class="btn btn-primary" disabled>Calculate</button>
+                                        </div>
+                                        
+                                        <button id="nextBTN" type="button" class="btn btn-primary"><i class="bi bi-table"></i></button>
+                
+                                    </div>                
+                
+                                </form>
+                
                             </div>
-            
+                
+                            <!-- fixtures and table tab  -->
+                            <div class="tab-pane fade" id="frontendPane" role="tabpanel" aria-labelledby="frontend-pane">
+                
+                                <div class="row">
+                
+                                    <div id="frontendMain" class="col-12 col-md-8">
+                
+                                        <h2 class="text-center">Fixtures</h2>
+                
+                                        <div id="fixtures"></div>
+                
+                                    </div>
+                
+                                    <div id="frontendAside" class="col-12 col-md-4">
+                
+                                        <h2 class="text-center">Table</h2>
+                
+                                        <div class="row mb-4">
+                                            <div id="leaderboard" class="col-12"></div>
+                                        </div>
+                
+                                        <div class="text-center mb-3">
+                                            <div class="btn-group" role="group" aria-label="back button group">
+                                                <button id="lockBackBTN" type="button" class="btn btn-primary"><i class="bi bi-unlock"></i></button>
+                                                <button id="backBTN" type="button" class="btn btn-primary" disabled><i class="bi bi-arrow-left"></i></button>
+                                            </div>
+                                        </div>
+                
+                                    </div>
+                
+                                </div>
+                
+                            </div>
+                
                         </div>
-            
+                    
                     </div>
+
                 </div>
 
             </div>   
